@@ -200,14 +200,15 @@
     const selectsContainer = document.createElement('div');
     selectsContainer.style.cssText = 'flex: 1; display: flex; flex-direction: column; gap: 5px;';
 
-    // 第一行6个下拉菜单
+    // 第一行6个数字输入框
     const row1 = document.createElement('div');
     row1.style.cssText = 'display: flex; gap: 3px;';
     for (let i = 0; i < 6; i++) {
-      const select = document.createElement('select');
-      select.style.cssText = 'flex: 1; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white;';
-      select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
-      row1.appendChild(select);
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; text-align: center;';
+      input.placeholder = '0';
+      row1.appendChild(input);
     }
 
     // 第二行6个下拉菜单
@@ -215,7 +216,7 @@
     row2.style.cssText = 'display: flex; gap: 3px;';
     for (let i = 0; i < 6; i++) {
       const select = document.createElement('select');
-      select.style.cssText = 'flex: 1; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white;';
+      select.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white;';
       select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
       row2.appendChild(select);
     }
