@@ -106,9 +106,9 @@
 
   // 小面板的 HTML 结构
   const panelHtml = `
-    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 280px; height: 400px; background: rgba(0, 0, 0, 0.85); color: white; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 320px; height: 600px; background: rgba(0, 0, 0, 0.65); color: white; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
       <h3 style="margin: 0 0 10px 0; text-align: center; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">霸天虎面板</h3>
-      <div id="bth-status" style="background: rgba(255,255,255,0.1); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
+      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
         <div style="margin-bottom: 5px;">📊 <strong>期数：</strong><span id="period">-</span></div>
         <div style="margin-bottom: 5px;">🎲 <strong>结果：</strong><span id="game-result">-</span></div>
         <div style="margin-bottom: 5px;">💰 <strong>状态：</strong><span id="status">-</span></div>
@@ -116,9 +116,8 @@
         <div style="margin-bottom: 5px;">🏆 <strong>总分：</strong><span id="total-score">-</span></div>
         <div style="font-size: 11px; color: #aaa;">🕐 <span id="update-time">-</span></div>
       </div>
-      <div id="log-content" style="overflow-y: auto; height: 120px; background: rgba(255,255,255,0.05); padding: 8px; border-radius: 5px; margin-bottom: 10px; font-size: 11px;"></div>
-      <button id="clear-logs" style="width: 100%; padding: 8px; background: #f44336; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">清理日志</button>
-      <button id="place-bet" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 5px; margin-top: 8px; cursor: pointer; font-weight: bold;">下注</button>
+      <button id="add-pattern" style="width: 100%; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
+      <div id="pattern-container" style="margin-top: 10px; max-height: 450px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
     </div>
   `;
 
@@ -163,53 +162,80 @@
 
     document.getElementById('total-score').textContent = bth.totalScore || '-';
     document.getElementById('update-time').textContent = bth.time || '-';
-
-    // 更新日志显示（只显示最近3条）
-    const logContent = document.getElementById('log-content');
-    logContent.innerHTML = '';
-
-    const recentLogs = window.logs.slice(-3); // 只显示最近3条
-    recentLogs.forEach((log, index) => {
-      const logDiv = document.createElement('div');
-      logDiv.style.marginBottom = '5px';
-      logDiv.style.borderBottom = '1px solid rgba(255,255,255,0.1)';
-      logDiv.style.paddingBottom = '5px';
-
-      if (log.msg && log.msg[0]) {
-        logDiv.textContent = `${log.msg[0]}`;
-      } else {
-        logDiv.textContent = JSON.stringify(log).substring(0, 50) + '...';
-      }
-
-      logContent.appendChild(logDiv);
-    });
   }
 
-  // 清理日志按钮点击事件
-  document.getElementById('clear-logs').addEventListener('click', () => {
-    window.logs = []; // 清空 logs
-    updatePanel(); // 更新面板
-    console.log('%c日志已清空', 'color: red');
-  });
-
-  // 下注按钮点击事件
-  document.getElementById('place-bet').addEventListener('click', () => {
-    const message = '庄20'; // 在此处修改下注的消息内容
-    fetch('http://zzxxyy.shop/doXiazhu.html', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        message: message
-      })
-    })
-    .then(res => res.json())
-    .then(d => {
-      if (d.msg === null) d.msg = [];
-      console.log(d);
-    })
-    .catch(error => console.error('下注请求出错:', error));
-  });
+  // 下注功能（待用）
+  // function placeBet(message) {
+  //   fetch('http://zzxxyy.shop/doXiazhu.html', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  //     body: new URLSearchParams({
+  //       message: message
+  //     })
+  //   })
+  //   .then(res => res.json())
+  //   .then(d => {
+  //     if (d.msg === null) d.msg = [];
+  //     console.log(d);
+  //   })
+  //   .catch(error => console.error('下注请求出错:', error));
+  // }
 
   // 定时更新面板内容
   setInterval(updatePanel, 5000); // 每5秒更新一次面板
+
+  // 牌路管理
+  let patternIdCounter = 0;
+
+  // 创建牌路元素
+  function createPattern() {
+    const patternId = patternIdCounter++;
+    const container = document.getElementById('pattern-container');
+
+    const patternDiv = document.createElement('div');
+    patternDiv.id = `pattern-${patternId}`;
+    patternDiv.style.cssText = 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 8px; margin-bottom: 8px; display: flex; align-items: center;';
+
+    // 创建下拉菜单容器
+    const selectsContainer = document.createElement('div');
+    selectsContainer.style.cssText = 'flex: 1; display: flex; flex-direction: column; gap: 5px;';
+
+    // 第一行6个下拉菜单
+    const row1 = document.createElement('div');
+    row1.style.cssText = 'display: flex; gap: 3px;';
+    for (let i = 0; i < 6; i++) {
+      const select = document.createElement('select');
+      select.style.cssText = 'flex: 1; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white;';
+      select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
+      row1.appendChild(select);
+    }
+
+    // 第二行6个下拉菜单
+    const row2 = document.createElement('div');
+    row2.style.cssText = 'display: flex; gap: 3px;';
+    for (let i = 0; i < 6; i++) {
+      const select = document.createElement('select');
+      select.style.cssText = 'flex: 1; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white;';
+      select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
+      row2.appendChild(select);
+    }
+
+    selectsContainer.appendChild(row1);
+    selectsContainer.appendChild(row2);
+
+    // 创建删除按钮
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = '×';
+    deleteBtn.style.cssText = 'width: 30px; height: 50px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 20px; font-weight: bold; margin-left: 5px;';
+    deleteBtn.onclick = () => {
+      patternDiv.remove();
+    };
+
+    patternDiv.appendChild(selectsContainer);
+    patternDiv.appendChild(deleteBtn);
+    container.appendChild(patternDiv);
+  }
+
+  // 新增牌路按钮事件
+  document.getElementById('add-pattern').addEventListener('click', createPattern);
 })();
