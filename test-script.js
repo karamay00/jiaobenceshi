@@ -4,7 +4,12 @@ const puppeteer = require('puppeteer');
   const browser = await puppeteer.launch({
     headless: false, // 有界面模式
     executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-    args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    userDataDir: './chrome-user-data', // 使用独立的用户数据目录，会保存登录状态
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-blink-features=AutomationControlled' // 隐藏自动化特征
+    ],
     defaultViewport: null // 使用完整窗口大小
   });
 
