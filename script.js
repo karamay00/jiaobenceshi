@@ -106,7 +106,7 @@
 
   // 小面板的 HTML 结构
   const panelHtml = `
-    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 320px; height: 600px; background: rgba(0, 0, 0, 0.65); color: white; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 420px; height: 600px; background: rgba(0, 0, 0, 0.65); color: white; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
       <h3 style="margin: 0 0 10px 0; text-align: center; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">霸天虎面板</h3>
       <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
         <div style="margin-bottom: 5px;">📊 <strong>期数：</strong><span id="period">-</span></div>
@@ -194,57 +194,79 @@
 
     const patternDiv = document.createElement('div');
     patternDiv.id = `pattern-${patternId}`;
-    patternDiv.style.cssText = 'background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 5px; padding: 8px; margin-bottom: 8px; display: flex; align-items: center;';
+    patternDiv.style.cssText = 'margin-bottom: 8px; display: flex; align-items: center;';
+
+    // 创建可滚动的外层容器
+    const scrollContainer = document.createElement('div');
+    scrollContainer.style.cssText = 'flex: 1; overflow-x: auto; padding-bottom: 8px;';
 
     // 创建下拉菜单容器
     const selectsContainer = document.createElement('div');
-    selectsContainer.style.cssText = 'flex: 1; display: flex; flex-direction: column; gap: 5px;';
+    selectsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 5px;';
 
-    // 第一行6个数字输入框
+    // 第一行30个数字输入框
     const row1 = document.createElement('div');
     row1.style.cssText = 'display: flex; gap: 3px;';
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 30; i++) {
       const input = document.createElement('input');
       input.type = 'number';
-      input.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; text-align: center;';
+      input.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; text-align: center; flex-shrink: 0;';
       input.placeholder = '0';
       row1.appendChild(input);
     }
 
-    // 第二行6个状态下拉菜单
+    // 第二行30个下拉菜单
     const row2 = document.createElement('div');
     row2.style.cssText = 'display: flex; gap: 3px;';
-    for (let i = 0; i < 6; i++) {
-      const statusSelect = document.createElement('select');
-      statusSelect.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white;';
-      statusSelect.innerHTML = '<option value="null">null</option><option value="启动">启动</option>';
-      row2.appendChild(statusSelect);
-    }
-
-    // 第三行6个下拉菜单
-    const row3 = document.createElement('div');
-    row3.style.cssText = 'display: flex; gap: 3px;';
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 30; i++) {
       const select = document.createElement('select');
-      select.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white;';
+      select.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; flex-shrink: 0;';
       select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
-      row3.appendChild(select);
+      row2.appendChild(select);
     }
 
     selectsContainer.appendChild(row1);
     selectsContainer.appendChild(row2);
-    selectsContainer.appendChild(row3);
+    scrollContainer.appendChild(selectsContainer);
+
+    // 创建按钮容器
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = 'display: flex; flex-direction: column; gap: 3px; margin-left: 5px;';
+
+    // 创建确认按钮
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = '?';
+    confirmBtn.style.cssText = 'width: 30px; height: 30px; background: #9E9E9E; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 18px; font-weight: bold;';
+    confirmBtn.dataset.confirmed = 'false';
+    confirmBtn.onclick = () => {
+      if (confirmBtn.dataset.confirmed === 'false') {
+        // 切换到已确认状态
+        confirmBtn.textContent = '✓';
+        confirmBtn.style.background = '#4CAF50';
+        confirmBtn.dataset.confirmed = 'true';
+        console.log('已确认牌路', patternId);
+      } else {
+        // 切换回未确认状态
+        confirmBtn.textContent = '?';
+        confirmBtn.style.background = '#9E9E9E';
+        confirmBtn.dataset.confirmed = 'false';
+        console.log('取消确认牌路', patternId);
+      }
+    };
 
     // 创建删除按钮
     const deleteBtn = document.createElement('button');
     deleteBtn.textContent = '×';
-    deleteBtn.style.cssText = 'width: 30px; height: 70px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 20px; font-weight: bold; margin-left: 5px;';
+    deleteBtn.style.cssText = 'width: 30px; height: 30px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 18px; font-weight: bold;';
     deleteBtn.onclick = () => {
       patternDiv.remove();
     };
 
-    patternDiv.appendChild(selectsContainer);
-    patternDiv.appendChild(deleteBtn);
+    buttonContainer.appendChild(confirmBtn);
+    buttonContainer.appendChild(deleteBtn);
+
+    patternDiv.appendChild(scrollContainer);
+    patternDiv.appendChild(buttonContainer);
     container.appendChild(patternDiv);
   }
 
