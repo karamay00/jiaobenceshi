@@ -194,7 +194,16 @@
 
     const patternDiv = document.createElement('div');
     patternDiv.id = `pattern-${patternId}`;
-    patternDiv.style.cssText = 'margin-bottom: 8px; display: flex; align-items: center;';
+    patternDiv.style.cssText = 'margin-bottom: 8px;';
+
+    // 创建标题
+    const titleDiv = document.createElement('div');
+    titleDiv.style.cssText = 'color: white; font-size: 12px; margin-bottom: 5px;';
+    titleDiv.innerHTML = `本牌路累计盈亏：<span id="profit-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span>`;
+
+    // 创建内容容器
+    const contentDiv = document.createElement('div');
+    contentDiv.style.cssText = 'display: flex; align-items: center;';
 
     // 创建可滚动的外层容器
     const scrollContainer = document.createElement('div');
@@ -265,8 +274,11 @@
     buttonContainer.appendChild(confirmBtn);
     buttonContainer.appendChild(deleteBtn);
 
-    patternDiv.appendChild(scrollContainer);
-    patternDiv.appendChild(buttonContainer);
+    contentDiv.appendChild(scrollContainer);
+    contentDiv.appendChild(buttonContainer);
+
+    patternDiv.appendChild(titleDiv);
+    patternDiv.appendChild(contentDiv);
     container.appendChild(patternDiv);
   }
 
