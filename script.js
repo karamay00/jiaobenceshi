@@ -50,7 +50,8 @@
 
       const periodMatch = periodResult.split('：');
       const period = periodMatch[0]; // 期号
-      const result = periodMatch[1]; // 结果
+      const resultRaw = periodMatch[1]; // 结果
+      const result = resultRaw ? resultRaw.charAt(0) : resultRaw; // 只取第一个字（閒 或 庄）
       console.log(`第 ${period} 期结果: ${result}`);
 
       // 更新状态
