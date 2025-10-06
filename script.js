@@ -106,7 +106,7 @@
 
   // 小面板的 HTML 结构
   const panelHtml = `
-    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 420px; height: 600px; background: rgba(0, 0, 0, 0.65); color: white; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 420px; height: 600px; background: rgba(255, 255, 255, 0.35); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
       <h3 style="margin: 0 0 10px 0; text-align: center; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">霸天虎面板</h3>
       <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
         <div style="margin-bottom: 5px;">📊 <strong>期数：</strong><span id="period">-</span></div>
@@ -194,7 +194,7 @@
 
     const patternDiv = document.createElement('div');
     patternDiv.id = `pattern-${patternId}`;
-    patternDiv.style.cssText = 'margin-bottom: 8px;';
+    patternDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 5px;';
 
     // 创建标题
     const titleDiv = document.createElement('div');
@@ -229,8 +229,16 @@
     row2.style.cssText = 'display: flex; gap: 3px;';
     for (let i = 0; i < 30; i++) {
       const select = document.createElement('select');
-      select.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; flex-shrink: 0;';
+      select.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #ccc; background: red; color: white; flex-shrink: 0;';
       select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
+      // 根据选中值改变下拉菜单背景颜色
+      select.onchange = function() {
+        if (this.value === '庄') {
+          this.style.background = 'red';
+        } else {
+          this.style.background = 'blue';
+        }
+      };
       row2.appendChild(select);
     }
 
@@ -242,25 +250,12 @@
     const buttonContainer = document.createElement('div');
     buttonContainer.style.cssText = 'display: flex; flex-direction: column; gap: 3px; margin-left: 5px;';
 
-    // 创建确认按钮
-    const confirmBtn = document.createElement('button');
-    confirmBtn.textContent = '?';
-    confirmBtn.style.cssText = 'width: 30px; height: 30px; background: #9E9E9E; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 18px; font-weight: bold;';
-    confirmBtn.dataset.confirmed = 'false';
-    confirmBtn.onclick = () => {
-      if (confirmBtn.dataset.confirmed === 'false') {
-        // 切换到已确认状态
-        confirmBtn.textContent = '✓';
-        confirmBtn.style.background = '#4CAF50';
-        confirmBtn.dataset.confirmed = 'true';
-        console.log('已确认牌路', patternId);
-      } else {
-        // 切换回未确认状态
-        confirmBtn.textContent = '?';
-        confirmBtn.style.background = '#9E9E9E';
-        confirmBtn.dataset.confirmed = 'false';
-        console.log('取消确认牌路', patternId);
-      }
+    // 创建勾选框
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.style.cssText = 'width: 30px; height: 30px; cursor: pointer; margin: 0; background: white; border: 2px solid #333; border-radius: 3px; accent-color: #4CAF50;';
+    checkbox.onchange = () => {
+      console.log('牌路选中状态:', checkbox.checked, 'patternId:', patternId);
     };
 
     // 创建删除按钮
@@ -271,7 +266,7 @@
       patternDiv.remove();
     };
 
-    buttonContainer.appendChild(confirmBtn);
+    buttonContainer.appendChild(checkbox);
     buttonContainer.appendChild(deleteBtn);
 
     contentDiv.appendChild(scrollContainer);
