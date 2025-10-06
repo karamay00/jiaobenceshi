@@ -1,4 +1,17 @@
 (function () {
+  // 检查面板是否已经存在
+  const existingPanel = document.getElementById('custom-panel');
+  if (existingPanel) {
+    // 如果面板已存在，切换显示状态
+    if (existingPanel.style.display === 'none') {
+      existingPanel.style.display = 'block';
+      console.log('%c面板已重新显示', 'color: green');
+    } else {
+      console.log('%c面板已存在，无需重复创建', 'color: orange');
+    }
+    return; // 退出脚本，不重复执行
+  }
+
   const oldLog = console.log;
   window.logs = []; // 保存捕获的对象日志
 
@@ -106,8 +119,11 @@
 
   // 小面板的 HTML 结构
   const panelHtml = `
-    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 420px; height: 600px; background: rgba(255, 255, 255, 0.35); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-      <h3 style="margin: 0 0 10px 0; text-align: center; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">霸天虎面板</h3>
+    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 420px; height: 600px; background: rgba(128, 128, 128, 0.5); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">
+        <h3 style="margin: 0; flex: 1; text-align: center;">霸天虎面板</h3>
+        <button id="close-panel" style="width: 25px; height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0;">×</button>
+      </div>
       <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
         <div style="margin-bottom: 5px;">📊 <strong>期数：</strong><span id="period">-</span></div>
         <div style="margin-bottom: 5px;">🎲 <strong>结果：</strong><span id="game-result">-</span></div>
@@ -117,7 +133,7 @@
         <div style="font-size: 11px; color: #aaa;">🕐 <span id="update-time">-</span></div>
       </div>
       <button id="add-pattern" style="width: 100%; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
-      <div id="pattern-container" style="margin-top: 10px; max-height: 450px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
+      <div id="pattern-container" style="margin-top: 10px; max-height: 300px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
     </div>
   `;
 
@@ -279,4 +295,10 @@
 
   // 新增牌路按钮事件
   document.getElementById('add-pattern').addEventListener('click', createPattern);
+
+  // 关闭面板按钮事件
+  document.getElementById('close-panel').addEventListener('click', () => {
+    document.getElementById('custom-panel').style.display = 'none';
+    console.log('%c面板已隐藏，所有数据已保留。再次点击书签可重新显示面板。', 'color: orange');
+  });
 })();
