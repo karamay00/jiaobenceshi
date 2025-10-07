@@ -356,20 +356,22 @@
     });
   }
 
-  // 动态添加列到预设组（一次添加整组基础模式）
+  // 动态添加列到预设组（一次添加1列）
   function addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns) {
     const inputRow = document.getElementById(`input-row-${groupId}`);
 
-    // 添加整组基础模式的列
-    for (let col = 0; col < basePatternColCount; col++) {
-      // 添加输入框
-      inputRow.appendChild(createAmountInput());
+    // 添加输入框
+    inputRow.appendChild(createAmountInput());
 
-      // 为每一行添加下拉菜单（使用基础模式的值，可编辑）
-      for (let row = 0; row < rowCount; row++) {
-        const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
-        selectRow.appendChild(createBetSelect(patterns[row][col], true));
-      }
+    // 计算当前新增列的索引位置
+    const currentColIndex = inputRow.children.length - 1;
+    // 对基础模式列数取余，得到应使用的基础模式索引
+    const patternIndex = currentColIndex % basePatternColCount;
+
+    // 为每一行添加下拉菜单（使用计算出的基础模式值，不可编辑）
+    for (let row = 0; row < rowCount; row++) {
+      const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
+      selectRow.appendChild(createBetSelect(patterns[row][patternIndex], false));
     }
 
     // 启用删除按钮
@@ -379,7 +381,7 @@
     }
   }
 
-  // 删除预设组的最后一组列
+  // 删除预设组的最后1列
   function deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCount) {
     const inputRow = document.getElementById(`input-row-${groupId}`);
 
@@ -388,19 +390,16 @@
       return; // 不能删除初始列
     }
 
-    // 删除整组基础模式的列
-    for (let col = 0; col < basePatternColCount; col++) {
-      // 删除输入框的最后一个
-      if (inputRow.lastChild) {
-        inputRow.removeChild(inputRow.lastChild);
-      }
+    // 删除输入框的最后一个
+    if (inputRow.lastChild) {
+      inputRow.removeChild(inputRow.lastChild);
+    }
 
-      // 删除每行下拉菜单的最后一个
-      for (let row = 0; row < rowCount; row++) {
-        const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
-        if (selectRow && selectRow.lastChild) {
-          selectRow.removeChild(selectRow.lastChild);
-        }
+    // 删除每行下拉菜单的最后一个
+    for (let row = 0; row < rowCount; row++) {
+      const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
+      if (selectRow && selectRow.lastChild) {
+        selectRow.removeChild(selectRow.lastChild);
       }
     }
 
