@@ -275,6 +275,7 @@
 
     const rowCount = patterns.length;      // 行数（动态）
     const colCount = patterns[0].length;   // 列数（动态）
+    const initialColCount = colCount;      // 记录初始列数
 
     // 创建组容器
     const groupDiv = document.createElement('div');
@@ -320,9 +321,9 @@
     controlBar.innerHTML = `
       <span>本组累计盈亏：<span id="profit-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
       <button id="add-col-${groupId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">+新增</button>
+      <button id="delete-col-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>×删除</button>
       <input type="checkbox" id="enable-${groupId}" style="width: 20px; height: 20px; cursor: pointer;">
       <label for="enable-${groupId}" style="cursor: pointer;">启用</label>
-      <button id="delete-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;">×删除</button>
     `;
 
     groupDiv.appendChild(tableContainer);
@@ -334,8 +335,8 @@
       addColumnToPresetGroup(groupId, rowCount);
     });
 
-    document.getElementById(`delete-${groupId}`).addEventListener('click', () => {
-      groupDiv.remove();
+    document.getElementById(`delete-col-${groupId}`).addEventListener('click', () => {
+      deleteLastColumn(groupId, rowCount, initialColCount);
     });
 
     document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
@@ -354,6 +355,43 @@
     for (let i = 0; i < rowCount; i++) {
       const selectRow = document.getElementById(`select-row-${groupId}-${i}`);
       selectRow.appendChild(createBetSelect('庄', true));
+    }
+
+    // 启用删除按钮
+    const deleteBtn = document.getElementById(`delete-col-${groupId}`);
+    if (deleteBtn) {
+      deleteBtn.disabled = false;
+    }
+  }
+
+  // 删除预设组的最后一列
+  function deleteLastColumn(groupId, rowCount, initialColCount) {
+    const inputRow = document.getElementById(`input-row-${groupId}`);
+
+    // 检查是否有可删除的列
+    if (inputRow.children.length <= initialColCount) {
+      return; // 不能删除预设列
+    }
+
+    // 删除输入框的最后一个
+    if (inputRow.lastChild) {
+      inputRow.removeChild(inputRow.lastChild);
+    }
+
+    // 删除每行下拉菜单的最后一个
+    for (let i = 0; i < rowCount; i++) {
+      const selectRow = document.getElementById(`select-row-${groupId}-${i}`);
+      if (selectRow && selectRow.lastChild) {
+        selectRow.removeChild(selectRow.lastChild);
+      }
+    }
+
+    // 如果删除后只剩初始列数，禁用删除按钮
+    if (inputRow.children.length <= initialColCount) {
+      const deleteBtn = document.getElementById(`delete-col-${groupId}`);
+      if (deleteBtn) {
+        deleteBtn.disabled = true;
+      }
     }
   }
 
