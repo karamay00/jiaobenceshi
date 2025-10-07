@@ -151,6 +151,9 @@
   `;
   document.head.appendChild(style);
 
+  // 初始化预设牌路组
+  createPresetPatternGroup(PRESET_CONFIGS[0]);
+
   // 更新面板内容显示
   function updatePanel() {
     // 更新霸天虎状态
@@ -253,6 +256,108 @@
     });
 
     return column;
+  }
+
+  // 预设牌路配置
+  const PRESET_CONFIGS = [
+    {
+      name: '预设组1',
+      patterns: [
+        ['庄','庄','閒','庄','庄','閒'],
+        ['庄','閒','庄','庄','閒','庄'],
+        ['閒','庄','庄','閒','庄','庄']
+      ]
+    }
+  ];
+
+  // 创建预设牌路组
+  function createPresetPatternGroup(config) {
+    const { name, patterns } = config;
+    const groupId = patternIdCounter++;
+    const container = document.getElementById('pattern-container');
+
+    const rowCount = patterns.length;      // 行数（动态）
+    const colCount = patterns[0].length;   // 列数（动态）
+
+    // 创建组容器
+    const groupDiv = document.createElement('div');
+    groupDiv.id = `preset-group-${groupId}`;
+    groupDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 5px;';
+
+    // 创建表格容器
+    const tableContainer = document.createElement('div');
+    tableContainer.style.cssText = 'display: flex; flex-direction: column; gap: 3px; overflow-x: auto;';
+
+    // 第1行：数字输入框
+    const inputRow = document.createElement('div');
+    inputRow.id = `input-row-${groupId}`;
+    inputRow.style.cssText = 'display: flex; gap: 3px;';
+
+    // 第2到(rowCount+1)行：下拉菜单
+    const selectRows = [];
+    for (let i = 0; i < rowCount; i++) {
+      const row = document.createElement('div');
+      row.id = `select-row-${groupId}-${i}`;
+      row.style.cssText = 'display: flex; gap: 3px;';
+      selectRows.push(row);
+    }
+
+    // 初始列数
+    for (let col = 0; col < colCount; col++) {
+      // 添加输入框
+      inputRow.appendChild(createAmountInput());
+
+      // 添加下拉菜单（预设值，不可编辑）
+      for (let row = 0; row < rowCount; row++) {
+        selectRows[row].appendChild(createBetSelect(patterns[row][col], false));
+      }
+    }
+
+    // 组装表格
+    tableContainer.appendChild(inputRow);
+    selectRows.forEach(row => tableContainer.appendChild(row));
+
+    // 底部控制栏
+    const controlBar = document.createElement('div');
+    controlBar.style.cssText = 'margin-top: 10px; display: flex; align-items: center; gap: 10px; color: white; font-size: 12px;';
+    controlBar.innerHTML = `
+      <span>本组累计盈亏：<span id="profit-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
+      <button id="add-col-${groupId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">+新增</button>
+      <input type="checkbox" id="enable-${groupId}" style="width: 20px; height: 20px; cursor: pointer;">
+      <label for="enable-${groupId}" style="cursor: pointer;">启用</label>
+      <button id="delete-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;">×删除</button>
+    `;
+
+    groupDiv.appendChild(tableContainer);
+    groupDiv.appendChild(controlBar);
+    container.appendChild(groupDiv);
+
+    // 绑定事件
+    document.getElementById(`add-col-${groupId}`).addEventListener('click', () => {
+      addColumnToPresetGroup(groupId, rowCount);
+    });
+
+    document.getElementById(`delete-${groupId}`).addEventListener('click', () => {
+      groupDiv.remove();
+    });
+
+    document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
+      console.log(`预设组 ${groupId} ${e.target.checked ? '已启用' : '已停用'}`);
+    });
+  }
+
+  // 动态添加列到预设组
+  function addColumnToPresetGroup(groupId, rowCount) {
+    const inputRow = document.getElementById(`input-row-${groupId}`);
+
+    // 添加输入框
+    inputRow.appendChild(createAmountInput());
+
+    // 为每一行添加下拉菜单（可编辑）
+    for (let i = 0; i < rowCount; i++) {
+      const selectRow = document.getElementById(`select-row-${groupId}-${i}`);
+      selectRow.appendChild(createBetSelect('庄', true));
+    }
   }
 
   // 牌路管理
