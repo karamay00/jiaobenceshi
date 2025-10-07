@@ -140,6 +140,17 @@
   // 插入面板到页面中
   document.body.insertAdjacentHTML('beforeend', panelHtml);
 
+  // 隐藏数字输入框的上下箭头（spinner）
+  const style = document.createElement('style');
+  style.textContent = `
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  `;
+  document.head.appendChild(style);
+
   // 更新面板内容显示
   function updatePanel() {
     // 更新霸天虎状态
@@ -205,7 +216,7 @@
   function createAmountInput(value = '') {
     const input = document.createElement('input');
     input.type = 'number';
-    input.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; text-align: center; flex-shrink: 0;';
+    input.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; text-align: center; flex-shrink: 0; -moz-appearance: textfield;';
     input.placeholder = '0';
     if (value) input.value = value;
     return input;
