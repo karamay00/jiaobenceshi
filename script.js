@@ -151,9 +151,6 @@
   `;
   document.head.appendChild(style);
 
-  // 初始化预设牌路组
-  createPresetPatternGroup(PRESET_CONFIGS[0]);
-
   // 更新面板内容显示
   function updatePanel() {
     // 更新霸天虎状态
@@ -461,4 +458,7 @@
     document.getElementById('custom-panel').style.display = 'none';
     console.log('%c面板已隐藏，所有数据已保留。再次点击书签可重新显示面板。', 'color: orange');
   });
+
+  // 初始化预设牌路组
+  createPresetPatternGroup(PRESET_CONFIGS[0]);
 })();
