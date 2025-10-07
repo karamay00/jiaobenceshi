@@ -255,14 +255,23 @@
     return column;
   }
 
-  // 预设牌路配置
+  // 预设牌路配置（定义1组基础模式，创建时会自动复制）
   const PRESET_CONFIGS = [
     {
       name: '预设组1',
       patterns: [
-        ['庄','庄','閒','庄','庄','閒'],
-        ['庄','閒','庄','庄','閒','庄'],
-        ['閒','庄','庄','閒','庄','庄']
+        ['庄','庄','閒'],
+        ['庄','閒','庄'],
+        ['閒','庄','庄']
+      ]
+    },
+    {
+      name: '预设组2',
+      patterns: [
+        ['庄','庄','庄','閒'],
+        ['庄','庄','閒','庄'],
+        ['庄','閒','庄','庄'],
+        ['閒','庄','庄','庄']
       ]
     }
   ];
@@ -273,9 +282,12 @@
     const groupId = patternIdCounter++;
     const container = document.getElementById('pattern-container');
 
-    const rowCount = patterns.length;      // 行数（动态）
-    const colCount = patterns[0].length;   // 列数（动态）
-    const initialColCount = colCount;      // 记录初始列数
+    const rowCount = patterns.length;              // 行数
+    const basePatternColCount = patterns[0].length; // 基础模式的列数
+
+    // 自动复制一次基础模式
+    const duplicatedPatterns = patterns.map(row => [...row, ...row]);
+    const initialColCount = duplicatedPatterns[0].length; // 初始列数（已复制）
 
     // 创建组容器
     const groupDiv = document.createElement('div');
@@ -300,14 +312,14 @@
       selectRows.push(row);
     }
 
-    // 初始列数
-    for (let col = 0; col < colCount; col++) {
+    // 初始列数（使用复制后的模式）
+    for (let col = 0; col < initialColCount; col++) {
       // 添加输入框
       inputRow.appendChild(createAmountInput());
 
       // 添加下拉菜单（预设值，不可编辑）
       for (let row = 0; row < rowCount; row++) {
-        selectRows[row].appendChild(createBetSelect(patterns[row][col], false));
+        selectRows[row].appendChild(createBetSelect(duplicatedPatterns[row][col], false));
       }
     }
 
@@ -332,11 +344,11 @@
 
     // 绑定事件
     document.getElementById(`add-col-${groupId}`).addEventListener('click', () => {
-      addColumnToPresetGroup(groupId, rowCount);
+      addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns);
     });
 
     document.getElementById(`delete-col-${groupId}`).addEventListener('click', () => {
-      deleteLastColumn(groupId, rowCount, initialColCount);
+      deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCount);
     });
 
     document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
@@ -344,17 +356,20 @@
     });
   }
 
-  // 动态添加列到预设组
-  function addColumnToPresetGroup(groupId, rowCount) {
+  // 动态添加列到预设组（一次添加整组基础模式）
+  function addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns) {
     const inputRow = document.getElementById(`input-row-${groupId}`);
 
-    // 添加输入框
-    inputRow.appendChild(createAmountInput());
+    // 添加整组基础模式的列
+    for (let col = 0; col < basePatternColCount; col++) {
+      // 添加输入框
+      inputRow.appendChild(createAmountInput());
 
-    // 为每一行添加下拉菜单（可编辑）
-    for (let i = 0; i < rowCount; i++) {
-      const selectRow = document.getElementById(`select-row-${groupId}-${i}`);
-      selectRow.appendChild(createBetSelect('庄', true));
+      // 为每一行添加下拉菜单（使用基础模式的值，可编辑）
+      for (let row = 0; row < rowCount; row++) {
+        const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
+        selectRow.appendChild(createBetSelect(patterns[row][col], true));
+      }
     }
 
     // 启用删除按钮
@@ -364,25 +379,28 @@
     }
   }
 
-  // 删除预设组的最后一列
-  function deleteLastColumn(groupId, rowCount, initialColCount) {
+  // 删除预设组的最后一组列
+  function deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCount) {
     const inputRow = document.getElementById(`input-row-${groupId}`);
 
     // 检查是否有可删除的列
     if (inputRow.children.length <= initialColCount) {
-      return; // 不能删除预设列
+      return; // 不能删除初始列
     }
 
-    // 删除输入框的最后一个
-    if (inputRow.lastChild) {
-      inputRow.removeChild(inputRow.lastChild);
-    }
+    // 删除整组基础模式的列
+    for (let col = 0; col < basePatternColCount; col++) {
+      // 删除输入框的最后一个
+      if (inputRow.lastChild) {
+        inputRow.removeChild(inputRow.lastChild);
+      }
 
-    // 删除每行下拉菜单的最后一个
-    for (let i = 0; i < rowCount; i++) {
-      const selectRow = document.getElementById(`select-row-${groupId}-${i}`);
-      if (selectRow && selectRow.lastChild) {
-        selectRow.removeChild(selectRow.lastChild);
+      // 删除每行下拉菜单的最后一个
+      for (let row = 0; row < rowCount; row++) {
+        const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
+        if (selectRow && selectRow.lastChild) {
+          selectRow.removeChild(selectRow.lastChild);
+        }
       }
     }
 
@@ -499,4 +517,5 @@
 
   // 初始化预设牌路组
   createPresetPatternGroup(PRESET_CONFIGS[0]);
+  createPresetPatternGroup(PRESET_CONFIGS[1]);
 })();
