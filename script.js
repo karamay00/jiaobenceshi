@@ -200,6 +200,50 @@
   // 定时更新面板内容
   setInterval(updatePanel, 5000); // 每5秒更新一次面板
 
+  // 通用组件函数
+  // 创建数字输入框
+  function createAmountInput(value = '') {
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; text-align: center; flex-shrink: 0;';
+    input.placeholder = '0';
+    if (value) input.value = value;
+    return input;
+  }
+
+  // 创建下拉菜单（庄/闲）
+  function createBetSelect(defaultValue = '庄', isEditable = true) {
+    const select = document.createElement('select');
+    select.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #ccc; color: white; flex-shrink: 0;';
+    select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
+    select.value = defaultValue;
+    select.style.background = defaultValue === '庄' ? 'red' : 'blue';
+
+    if (!isEditable) {
+      select.disabled = true;
+    }
+
+    select.onchange = function() {
+      this.style.background = this.value === '庄' ? 'red' : 'blue';
+    };
+
+    return select;
+  }
+
+  // 创建一列（包含输入框和多个下拉菜单）
+  function createBettingColumn(selectValues = ['庄'], isEditable = true) {
+    const column = document.createElement('div');
+    column.style.cssText = 'display: flex; flex-direction: column; gap: 3px;';
+
+    column.appendChild(createAmountInput());
+
+    selectValues.forEach(value => {
+      column.appendChild(createBetSelect(value, isEditable));
+    });
+
+    return column;
+  }
+
   // 牌路管理
   let patternIdCounter = 0;
 
