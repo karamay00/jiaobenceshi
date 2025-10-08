@@ -24,6 +24,11 @@
           window.logs.push(a); // 保存对象日志
           oldLog('[JSON]', json); // 打印 JSON 格式的日志
 
+          // 立即检查是否包含 url 字段并解析游戏阶段
+          if (a.url) {
+            parseGamePhase(a);
+          }
+
           // 立即检查是否是开奖消息并解析
           if (a.msg && Array.isArray(a.msg) && a.msg[0] && a.msg[0].includes('期结果')) {
             setTimeout(() => parseDataAndDisplay(a), 100); // 延迟100ms解析，确保已添加到logs
@@ -44,11 +49,32 @@
   window.bthStatus = {
     period: '',
     result: '',
+    resultNumber: '', // 结果后面的数字（如"閒6"中的"6"）
     status: '',
     winLose: 0,
     totalScore: 0,
-    time: ''
+    time: '',
+    gamePhase: '' // 游戏阶段：可以下注 / 已封盘
   };
+
+  // 解析 URL 字段，识别游戏阶段
+  function parseGamePhase(logData) {
+    if (!logData || !logData.url) return;
+
+    const url = logData.url;
+
+    if (url.includes('/jiang/开局.png') || url.includes('/jiang/开宝.png')) {
+      window.bthStatus.gamePhase = '可以下注';
+      window.bthStatus.time = new Date().toLocaleTimeString();
+      console.log(`%c游戏状态: 可以下注`, 'color: green; font-weight: bold');
+      updatePanel();
+    } else if (url.includes('/jiang/封盘.png')) {
+      window.bthStatus.gamePhase = '已封盘';
+      window.bthStatus.time = new Date().toLocaleTimeString();
+      console.log(`%c游戏状态: 已封盘`, 'color: red; font-weight: bold');
+      updatePanel();
+    }
+  }
 
   // 解析和展示最新的期号和结果，并且显示"霸天虎"的输赢情况
   function parseDataAndDisplay(logData) {
@@ -65,11 +91,14 @@
       const period = periodMatch[0]; // 期号
       const resultRaw = periodMatch[1]; // 结果
       const result = resultRaw ? resultRaw.charAt(0) : resultRaw; // 只取第一个字（閒 或 庄）
-      console.log(`第 ${period} 期结果: ${result}`);
+      const numberMatch = resultRaw ? resultRaw.match(/\d+/) : null; // 提取数字
+      const resultNumber = numberMatch ? numberMatch[0] : '';
+      console.log(`第 ${period} 期结果: ${result}${resultNumber}`);
 
       // 更新状态
       window.bthStatus.period = period;
       window.bthStatus.result = result;
+      window.bthStatus.resultNumber = resultNumber;
       window.bthStatus.time = new Date().toLocaleTimeString();
 
       // 查找霸天虎信息
@@ -124,13 +153,14 @@
         <h3 style="margin: 0; flex: 1; text-align: center;">霸天虎面板</h3>
         <button id="close-panel" style="width: 25px; height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0;">×</button>
       </div>
-      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px;">
-        <div style="margin-bottom: 5px;">📊 <strong>期数：</strong><span id="period">-</span></div>
-        <div style="margin-bottom: 5px;">🎲 <strong>结果：</strong><span id="game-result">-</span></div>
-        <div style="margin-bottom: 5px;">💰 <strong>状态：</strong><span id="status">-</span></div>
-        <div style="margin-bottom: 5px;">📈 <strong>本期：</strong><span id="win-lose">-</span></div>
-        <div style="margin-bottom: 5px;">🏆 <strong>总分：</strong><span id="total-score">-</span></div>
-        <div style="font-size: 11px; color: #aaa;">🕐 <span id="update-time">-</span></div>
+      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+        <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
+        <div>📊 <strong>期数：</strong><span id="period">-</span></div>
+        <div>🎲 <strong>结果：</strong><span id="game-result">-</span></div>
+        <div>💰 <strong>状态：</strong><span id="status">-</span></div>
+        <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
+        <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
+        <div style="grid-column: 1 / -1; font-size: 11px; color: black;">🕐 <span id="update-time">-</span></div>
       </div>
       <button id="add-pattern" style="width: 100%; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
       <div id="pattern-container" style="margin-top: 10px; max-height: 300px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
@@ -155,8 +185,24 @@
   function updatePanel() {
     // 更新霸天虎状态
     const bth = window.bthStatus;
+
+    // 更新游戏阶段
+    const gamePhaseSpan = document.getElementById('game-phase');
+    gamePhaseSpan.textContent = bth.gamePhase || '-';
+    // 根据游戏阶段设置颜色
+    if (bth.gamePhase === '可以下注') {
+      gamePhaseSpan.style.color = '#4CAF50';
+      gamePhaseSpan.style.fontWeight = 'bold';
+    } else if (bth.gamePhase === '已封盘') {
+      gamePhaseSpan.style.color = '#f44336';
+      gamePhaseSpan.style.fontWeight = 'bold';
+    } else {
+      gamePhaseSpan.style.color = '#fff';
+      gamePhaseSpan.style.fontWeight = 'normal';
+    }
+
     document.getElementById('period').textContent = bth.period || '-';
-    document.getElementById('game-result').textContent = bth.result || '-';
+    document.getElementById('game-result').textContent = (bth.result || '-') + (bth.resultNumber || '');
 
     const statusSpan = document.getElementById('status');
     statusSpan.textContent = bth.status || '-';
