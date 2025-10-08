@@ -160,35 +160,65 @@
 
   // 小面板的 HTML 结构
   const panelHtml = `
-    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 420px; height: 600px; background: rgba(128, 128, 128, 0.5); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 630px; height: 600px; background: rgba(128, 128, 128, 0.6); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">
-        <h3 style="margin: 0; flex: 1; text-align: center;">霸天虎面板</h3>
-        <button id="close-panel" style="width: 25px; height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0;">×</button>
+        <button id="toggle-panel" style="width: 25px; height: 25px; background: #2196F3; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex-shrink: 0;">▼</button>
+        <h3 id="panel-title" style="margin: 0; flex: 1; text-align: center;">霸天虎面板</h3>
+        <button id="close-panel" style="width: 25px; height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex-shrink: 0;">×</button>
       </div>
-      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-        <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
-        <div>📊 <strong>期数：</strong><span id="period">-</span></div>
-        <div>🎲 <strong>结果：</strong><span id="game-result">-</span></div>
-        <div>💰 <strong>状态：</strong><span id="status">-</span></div>
-        <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
-        <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
-        <div style="grid-column: 1 / -1; font-size: 11px; color: black;">🕐 <span id="update-time">-</span></div>
+      <div id="panel-content">
+        <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+          <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
+          <div>📊 <strong>期数：</strong><span id="period">-</span></div>
+          <div>🎲 <strong>结果：</strong><span id="game-result">-</span></div>
+          <div>💰 <strong>状态：</strong><span id="status">-</span></div>
+          <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
+          <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
+          <div style="grid-column: 1 / -1; font-size: 11px; color: black;">🕐 <span id="update-time">-</span></div>
+        </div>
+        <button id="add-pattern" style="width: 100%; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
+        <div id="pattern-container" style="margin-top: 10px; max-height: 340px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
       </div>
-      <button id="add-pattern" style="width: 100%; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
-      <div id="pattern-container" style="margin-top: 10px; max-height: 300px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
     </div>
   `;
 
   // 插入面板到页面中
   document.body.insertAdjacentHTML('beforeend', panelHtml);
 
-  // 隐藏数字输入框的上下箭头（spinner）
+  // 隐藏数字输入框的上下箭头（spinner）和折叠面板样式
   const style = document.createElement('style');
   style.textContent = `
     input[type=number]::-webkit-inner-spin-button,
     input[type=number]::-webkit-outer-spin-button {
       -webkit-appearance: none;
       margin: 0;
+    }
+
+    /* 收起状态的样式 */
+    #custom-panel.collapsed {
+      width: 40px !important;
+      height: 40px !important;
+      padding: 0 !important;
+      border-radius: 50% !important;
+    }
+
+    #custom-panel.collapsed #panel-content,
+    #custom-panel.collapsed #panel-title,
+    #custom-panel.collapsed #close-panel {
+      display: none !important;
+    }
+
+    #custom-panel.collapsed > div:first-child {
+      border: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      justify-content: center !important;
+    }
+
+    #custom-panel.collapsed #toggle-panel {
+      width: 40px !important;
+      height: 40px !important;
+      font-size: 18px !important;
     }
   `;
   document.head.appendChild(style);
@@ -274,9 +304,7 @@
       const inputRow = document.getElementById(`input-row-${patternId}`);
       return inputRow ? inputRow.children.length : 0;
     } else {
-      const patternDiv = document.getElementById(patternId);
-      if (!patternDiv) return 0;
-      const inputRow = patternDiv.querySelector('div > div > div:nth-child(1)');
+      const inputRow = document.getElementById(`input-row-custom-${patternId}`);
       return inputRow ? inputRow.children.length : 0;
     }
   }
@@ -381,11 +409,8 @@
 
   // 尝试激活自定义牌路
   function tryActivateCustomPattern(patternId, state) {
-    const patternDiv = document.getElementById(patternId);
-    if (!patternDiv) return;
-
-    const inputRow = patternDiv.querySelector('div > div > div:nth-child(1)');
-    const selectRow = patternDiv.querySelector('div > div > div:nth-child(2)');
+    const inputRow = document.getElementById(`input-row-custom-${patternId}`);
+    const selectRow = document.getElementById(`select-row-custom-${patternId}`);
 
     if (!inputRow || !selectRow) return;
 
@@ -429,8 +454,9 @@
       if (state.isActivated) continue;
 
       // 检查是否勾选
-      const checkbox = document.getElementById(`enable-${patternId}`) ||
-                       document.querySelector(`#${patternId} input[type="checkbox"]`);
+      const checkbox = state.type === 'preset'
+        ? document.getElementById(`enable-${patternId}`)
+        : document.getElementById(`enable-custom-${patternId}`);
       if (!checkbox || !checkbox.checked) continue;
 
       // 尝试激活
@@ -453,8 +479,9 @@
       if (!state.isActivated) continue;
 
       // 必须勾选
-      const checkbox = document.getElementById(`enable-${patternId}`) ||
-                       document.querySelector(`#${patternId} input[type="checkbox"]`);
+      const checkbox = state.type === 'preset'
+        ? document.getElementById(`enable-${patternId}`)
+        : document.getElementById(`enable-custom-${patternId}`);
       if (!checkbox || !checkbox.checked) continue;
 
       // 获取当前列的金额和下注类型
@@ -469,11 +496,8 @@
         amount = parseInt(inputRow.children[state.currentPointer].value) || 0;
         betType = selectRow.children[state.currentPointer].value;
       } else {
-        const patternDiv = document.getElementById(patternId);
-        if (!patternDiv) continue;
-
-        const inputRow = patternDiv.querySelector('div > div > div:nth-child(1)');
-        const selectRow = patternDiv.querySelector('div > div > div:nth-child(2)');
+        const inputRow = document.getElementById(`input-row-custom-${patternId}`);
+        const selectRow = document.getElementById(`select-row-custom-${patternId}`);
 
         if (!inputRow || !selectRow || state.currentPointer >= inputRow.children.length) continue;
 
@@ -511,10 +535,7 @@
 
         expectedBetType = selectRow.children[state.currentPointer].value;
       } else {
-        const patternDiv = document.getElementById(patternId);
-        if (!patternDiv) continue;
-
-        const selectRow = patternDiv.querySelector('div > div > div:nth-child(2)');
+        const selectRow = document.getElementById(`select-row-custom-${patternId}`);
         if (!selectRow || state.currentPointer >= selectRow.children.length) continue;
 
         expectedBetType = selectRow.children[state.currentPointer].value;
@@ -692,7 +713,9 @@
     });
 
     document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
-      console.log(`预设组 ${groupId} ${e.target.checked ? '已启用' : '已停用'}`);
+      const isEnabled = e.target.checked;
+      console.log(`预设组 ${groupId} ${isEnabled ? '已启用' : '已停用'}`);
+      togglePresetGroupInteraction(groupId, isEnabled);
     });
 
     // 初始化牌路状态
@@ -779,80 +802,60 @@
     titleDiv.style.cssText = 'color: white; font-size: 12px; margin-bottom: 5px;';
     titleDiv.innerHTML = `本牌路累计盈亏：<span id="profit-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span>`;
 
-    // 创建内容容器
-    const contentDiv = document.createElement('div');
-    contentDiv.style.cssText = 'display: flex; align-items: center;';
+    // 创建表格容器
+    const tableContainer = document.createElement('div');
+    tableContainer.style.cssText = 'display: flex; flex-direction: column; gap: 3px; overflow-x: auto;';
 
-    // 创建可滚动的外层容器
-    const scrollContainer = document.createElement('div');
-    scrollContainer.style.cssText = 'flex: 1; overflow-x: auto; padding-bottom: 8px;';
-
-    // 创建下拉菜单容器
-    const selectsContainer = document.createElement('div');
-    selectsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 5px;';
-
-    // 第一行30个数字输入框
+    // 第一行：数字输入框（初始1列）
     const row1 = document.createElement('div');
+    row1.id = `input-row-custom-${patternId}`;
     row1.style.cssText = 'display: flex; gap: 3px;';
-    for (let i = 0; i < 30; i++) {
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #666; background: #333; color: white; text-align: center; flex-shrink: 0;';
-      input.placeholder = '0';
-      row1.appendChild(input);
-    }
+    row1.appendChild(createAmountInput());
 
-    // 第二行30个下拉菜单
+    // 第二行：下拉菜单（初始1列）
     const row2 = document.createElement('div');
+    row2.id = `select-row-custom-${patternId}`;
     row2.style.cssText = 'display: flex; gap: 3px;';
-    for (let i = 0; i < 30; i++) {
-      const select = document.createElement('select');
-      select.style.cssText = 'width: 40px; padding: 3px; font-size: 11px; border-radius: 3px; border: 1px solid #ccc; background: red; color: white; flex-shrink: 0;';
-      select.innerHTML = '<option value="庄">庄</option><option value="閒">閒</option>';
-      // 根据选中值改变下拉菜单背景颜色
-      select.onchange = function() {
-        if (this.value === '庄') {
-          this.style.background = 'red';
-        } else {
-          this.style.background = 'blue';
-        }
-      };
-      row2.appendChild(select);
-    }
+    row2.appendChild(createBetSelect('庄', true));
 
-    selectsContainer.appendChild(row1);
-    selectsContainer.appendChild(row2);
-    scrollContainer.appendChild(selectsContainer);
+    tableContainer.appendChild(row1);
+    tableContainer.appendChild(row2);
 
-    // 创建按钮容器
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.cssText = 'display: flex; flex-direction: column; gap: 3px; margin-left: 5px;';
-
-    // 创建勾选框
-    const checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.style.cssText = 'width: 30px; height: 30px; cursor: pointer; margin: 0; background: white; border: 2px solid #333; border-radius: 3px; accent-color: #4CAF50;';
-    checkbox.onchange = () => {
-      console.log('牌路选中状态:', checkbox.checked, 'patternId:', patternId);
-    };
-
-    // 创建删除按钮
-    const deleteBtn = document.createElement('button');
-    deleteBtn.textContent = '×';
-    deleteBtn.style.cssText = 'width: 30px; height: 30px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 18px; font-weight: bold;';
-    deleteBtn.onclick = () => {
-      patternDiv.remove();
-    };
-
-    buttonContainer.appendChild(checkbox);
-    buttonContainer.appendChild(deleteBtn);
-
-    contentDiv.appendChild(scrollContainer);
-    contentDiv.appendChild(buttonContainer);
+    // 底部控制栏
+    const controlBar = document.createElement('div');
+    controlBar.style.cssText = 'margin-top: 10px; display: flex; align-items: center; gap: 10px; color: white; font-size: 12px;';
+    controlBar.innerHTML = `
+      <button id="add-col-custom-${patternId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
+      <button id="delete-col-custom-${patternId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
+      <input type="checkbox" id="enable-custom-${patternId}" style="width: 20px; height: 20px; cursor: pointer;">
+      <label for="enable-custom-${patternId}" style="cursor: pointer;">启用</label>
+      <button id="delete-pattern-${patternId}" style="margin-left: auto; padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">×删除牌路</button>
+    `;
 
     patternDiv.appendChild(titleDiv);
-    patternDiv.appendChild(contentDiv);
+    patternDiv.appendChild(tableContainer);
+    patternDiv.appendChild(controlBar);
     container.appendChild(patternDiv);
+
+    // 绑定事件
+    document.getElementById(`add-col-custom-${patternId}`).addEventListener('click', () => {
+      addColumnToCustomPattern(patternId);
+    });
+
+    document.getElementById(`delete-col-custom-${patternId}`).addEventListener('click', () => {
+      deleteLastColumnFromCustomPattern(patternId);
+    });
+
+    document.getElementById(`enable-custom-${patternId}`).addEventListener('change', (e) => {
+      const isEnabled = e.target.checked;
+      console.log(`自定义牌路 ${patternId} ${isEnabled ? '已启用' : '已停用'}`);
+      toggleCustomPatternInteraction(patternId, isEnabled);
+    });
+
+    document.getElementById(`delete-pattern-${patternId}`).addEventListener('click', () => {
+      patternDiv.remove();
+      delete window.patternStates[`pattern-${patternId}`];
+    });
 
     // 初始化牌路状态
     window.patternStates[`pattern-${patternId}`] = {
@@ -865,6 +868,103 @@
     updatePatternUI(`pattern-${patternId}`, window.patternStates[`pattern-${patternId}`]);
   }
 
+  // 为自定义牌路添加一列
+  function addColumnToCustomPattern(patternId) {
+    const inputRow = document.getElementById(`input-row-custom-${patternId}`);
+    const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+
+    // 添加输入框
+    inputRow.appendChild(createAmountInput());
+
+    // 添加下拉菜单
+    selectRow.appendChild(createBetSelect('庄', true));
+
+    // 启用删除按钮
+    const deleteBtn = document.getElementById(`delete-col-custom-${patternId}`);
+    if (deleteBtn) {
+      deleteBtn.disabled = false;
+    }
+  }
+
+  // 删除自定义牌路的最后一列
+  function deleteLastColumnFromCustomPattern(patternId) {
+    const inputRow = document.getElementById(`input-row-custom-${patternId}`);
+    const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+
+    // 检查是否只剩1列
+    if (inputRow.children.length <= 1) {
+      return; // 不能删除最后一列
+    }
+
+    // 删除输入框的最后一个
+    if (inputRow.lastChild) {
+      inputRow.removeChild(inputRow.lastChild);
+    }
+
+    // 删除下拉菜单的最后一个
+    if (selectRow.lastChild) {
+      selectRow.removeChild(selectRow.lastChild);
+    }
+
+    // 如果删除后只剩1列，禁用删除按钮
+    if (inputRow.children.length <= 1) {
+      const deleteBtn = document.getElementById(`delete-col-custom-${patternId}`);
+      if (deleteBtn) {
+        deleteBtn.disabled = true;
+      }
+    }
+  }
+
+  // 锁定/解锁预设组的交互
+  function togglePresetGroupInteraction(groupId, isDisabled) {
+    // 禁用/启用所有输入框
+    const inputRow = document.getElementById(`input-row-${groupId}`);
+    if (inputRow) {
+      Array.from(inputRow.children).forEach(input => {
+        input.disabled = isDisabled;
+      });
+    }
+
+    // 禁用/启用增加和删除按钮
+    const addBtn = document.getElementById(`add-col-${groupId}`);
+    const deleteBtn = document.getElementById(`delete-col-${groupId}`);
+    if (addBtn) addBtn.disabled = isDisabled;
+    if (deleteBtn && inputRow && inputRow.children.length > 1) {
+      deleteBtn.disabled = isDisabled;
+    }
+  }
+
+  // 锁定/解锁自定义牌路的交互
+  function toggleCustomPatternInteraction(patternId, isDisabled) {
+    // 禁用/启用所有输入框
+    const inputRow = document.getElementById(`input-row-custom-${patternId}`);
+    if (inputRow) {
+      Array.from(inputRow.children).forEach(input => {
+        input.disabled = isDisabled;
+      });
+    }
+
+    // 禁用/启用所有下拉菜单
+    const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+    if (selectRow) {
+      Array.from(selectRow.children).forEach(select => {
+        select.disabled = isDisabled;
+      });
+    }
+
+    // 禁用/启用增加、删除列按钮
+    const addBtn = document.getElementById(`add-col-custom-${patternId}`);
+    const deleteBtn = document.getElementById(`delete-col-custom-${patternId}`);
+    if (addBtn) addBtn.disabled = isDisabled;
+    if (deleteBtn && inputRow && inputRow.children.length > 1) {
+      deleteBtn.disabled = isDisabled;
+    }
+
+    // 禁用/启用删除牌路按钮
+    const deletePatternBtn = document.getElementById(`delete-pattern-${patternId}`);
+    if (deletePatternBtn) deletePatternBtn.disabled = isDisabled;
+  }
+
   // 新增牌路按钮事件
   document.getElementById('add-pattern').addEventListener('click', createPattern);
 
@@ -872,6 +972,24 @@
   document.getElementById('close-panel').addEventListener('click', () => {
     document.getElementById('custom-panel').style.display = 'none';
     console.log('%c面板已隐藏，所有数据已保留。再次点击书签可重新显示面板。', 'color: orange');
+  });
+
+  // 折叠/展开面板功能
+  document.getElementById('toggle-panel').addEventListener('click', () => {
+    const panel = document.getElementById('custom-panel');
+    const toggleBtn = document.getElementById('toggle-panel');
+
+    if (panel.classList.contains('collapsed')) {
+      // 展开面板
+      panel.classList.remove('collapsed');
+      toggleBtn.textContent = '▼';
+      console.log('%c面板已展开', 'color: green');
+    } else {
+      // 收起面板
+      panel.classList.add('collapsed');
+      toggleBtn.textContent = '▲';
+      console.log('%c面板已收起', 'color: orange');
+    }
   });
 
   // 初始化预设牌路组
