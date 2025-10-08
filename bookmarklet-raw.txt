@@ -166,7 +166,10 @@ const panelHtml = `
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
         <div style="grid-column: 1 / -1; font-size: 11px; color: black;">🕐 <span id="update-time">-</span></div>
       </div>
-      <button id="add-pattern" style="width: 100%; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
+      <div style="display: flex; gap: 5px; margin-bottom: 10px;">
+        <button id="add-pattern" style="flex: 1; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
+        <button id="clear-history" style="flex: 1; padding: 8px; background: #FF9800; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">清空牌路</button>
+      </div>
       <div id="pattern-container" style="margin-top: 10px; max-height: 340px; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
     </div>
   </div>
@@ -1158,6 +1161,40 @@ function parseDataAndDisplay(logData) {
 
 // 新增牌路按钮事件
 document.getElementById('add-pattern').addEventListener('click', createPattern);
+
+// 清空牌路按钮事件
+document.getElementById('clear-history').addEventListener('click', () => {
+  // 1. 清空历史记录
+  window.gameHistory = [];
+  window.logs = [];
+
+  // 2. 重置霸天虎状态
+  window.bthStatus = {
+    period: '',
+    result: '',
+    resultNumber: '',
+    status: '',
+    winLose: 0,
+    totalScore: 0,
+    time: '',
+    gamePhase: ''
+  };
+
+  // 3. 重置所有牌路状态
+  for (let patternId in window.patternStates) {
+    const state = window.patternStates[patternId];
+    state.isActivated = false;
+    state.justActivated = false;
+    state.activeRowIndex = -1;
+    state.currentPointer = -1;
+    updatePatternUI(patternId, state);
+  }
+
+  // 4. 更新面板显示
+  updatePanel();
+
+  console.log('[清空牌路] 已清空历史和所有牌路状态');
+});
 
 // 关闭面板按钮事件
 document.getElementById('close-panel').addEventListener('click', () => {

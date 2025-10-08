@@ -3,6 +3,40 @@
 // 新增牌路按钮事件
 document.getElementById('add-pattern').addEventListener('click', createPattern);
 
+// 清空牌路按钮事件
+document.getElementById('clear-history').addEventListener('click', () => {
+  // 1. 清空历史记录
+  window.gameHistory = [];
+  window.logs = [];
+
+  // 2. 重置霸天虎状态
+  window.bthStatus = {
+    period: '',
+    result: '',
+    resultNumber: '',
+    status: '',
+    winLose: 0,
+    totalScore: 0,
+    time: '',
+    gamePhase: ''
+  };
+
+  // 3. 重置所有牌路状态
+  for (let patternId in window.patternStates) {
+    const state = window.patternStates[patternId];
+    state.isActivated = false;
+    state.justActivated = false;
+    state.activeRowIndex = -1;
+    state.currentPointer = -1;
+    updatePatternUI(patternId, state);
+  }
+
+  // 4. 更新面板显示
+  updatePanel();
+
+  console.log('[清空牌路] 已清空历史和所有牌路状态');
+});
+
 // 关闭面板按钮事件
 document.getElementById('close-panel').addEventListener('click', () => {
   document.getElementById('custom-panel').style.display = 'none';
