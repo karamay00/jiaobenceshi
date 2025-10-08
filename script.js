@@ -398,6 +398,7 @@
       if (isMatch) {
         // 激活该行
         state.isActivated = true;
+        state.justActivated = true; // 标记为刚激活，本期不推进
         state.activeRowIndex = row;
         state.currentPointer = entryPoint;
         console.log(`[激活] 预设组 ${groupId} 第 ${row} 行激活，指针在第 ${entryPoint} 列`);
@@ -439,6 +440,7 @@
 
     if (isMatch) {
       state.isActivated = true;
+      state.justActivated = true; // 标记为刚激活，本期不推进
       state.currentPointer = entryPoint;
       console.log(`[激活] 自定义牌路 ${patternId} 激活，指针在第 ${entryPoint} 列`);
       updatePatternUI(patternId, state);
@@ -525,6 +527,13 @@
 
       // 只处理已激活的牌路
       if (!state.isActivated) continue;
+
+      // 跳过刚激活的牌路（本期不推进）
+      if (state.justActivated) {
+        state.justActivated = false; // 清除标记，下期开始正常推进
+        console.log(`[跳过推进] ${patternId} 刚激活，本期不推进指针`);
+        continue;
+      }
 
       // 获取当前指针列的下注类型
       let expectedBetType;
