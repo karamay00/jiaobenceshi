@@ -398,6 +398,50 @@ function updatePatternUI(patternId, state) {
     statusElement.textContent = '[未激活]';
     statusElement.style.color = '#fff';
   }
+
+  // 高亮当前激活位置的下拉菜单
+  if (state.type === 'preset') {
+    // 清除该预设组所有行的高亮
+    for (let row = 0; row < state.rowCount; row++) {
+      const selectRow = document.getElementById(`select-row-${patternId}-${row}`);
+      if (selectRow) {
+        Array.from(selectRow.children).forEach(select => {
+          select.style.border = '1px solid #ccc';
+          select.style.boxShadow = 'none';
+        });
+      }
+    }
+
+    // 高亮激活行的当前列
+    if (state.isActivated && state.activeRowIndex >= 0) {
+      const selectRow = document.getElementById(`select-row-${patternId}-${state.activeRowIndex}`);
+      const highlightIndex = Math.max(0, state.currentPointer - 1);
+      if (selectRow && selectRow.children[highlightIndex]) {
+        const targetSelect = selectRow.children[highlightIndex];
+        targetSelect.style.border = '3px solid #FFD700';
+        targetSelect.style.boxShadow = '0 0 8px #FFD700';
+      }
+    }
+  } else {
+    // 自定义牌路：清除所有高亮
+    const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+    if (selectRow) {
+      Array.from(selectRow.children).forEach(select => {
+        select.style.border = '1px solid #ccc';
+        select.style.boxShadow = 'none';
+      });
+
+      // 高亮当前列
+      if (state.isActivated) {
+        const highlightIndex = Math.max(0, state.currentPointer - 1);
+        if (selectRow.children[highlightIndex]) {
+          const targetSelect = selectRow.children[highlightIndex];
+          targetSelect.style.border = '3px solid #FFD700';
+          targetSelect.style.boxShadow = '0 0 8px #FFD700';
+        }
+      }
+    }
+  }
 }
 
 // 尝试激活预设组
