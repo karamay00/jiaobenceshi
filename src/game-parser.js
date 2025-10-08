@@ -93,6 +93,3 @@ function parseDataAndDisplay(logData) {
     advancePointers(window.bthStatus.result);
   }
 }
-
-// 每当新数据进来时，触发解析和显示
-setInterval(parseDataAndDisplay, 5000); // 每隔5秒检查并解析日志

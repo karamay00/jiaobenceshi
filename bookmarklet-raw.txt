@@ -554,7 +554,17 @@ function autoPlaceBets() {
 
     // 执行下注
     const message = `${betType}${amount}`;
-    console.log(`[执行下注] ${patternId} 下注: ${message}`);
+
+    // 生成牌路描述
+    let patternDesc;
+    if (state.type === 'preset') {
+      patternDesc = `预设组${parseInt(patternId) + 1}-行${state.activeRowIndex + 1}-第${state.currentPointer}列`;
+    } else {
+      const customId = patternId.replace('pattern-', '');
+      patternDesc = `自定义牌路${customId}-第${state.currentPointer}列`;
+    }
+
+    console.log(`[执行下注] ${patternDesc} 下注: ${message}`);
     // placeBet(message); // 已注释：测试时不实际发送下注请求
   }
 }
@@ -1142,9 +1152,6 @@ function parseDataAndDisplay(logData) {
     advancePointers(window.bthStatus.result);
   }
 }
-
-// 每当新数据进来时，触发解析和显示
-setInterval(parseDataAndDisplay, 5000); // 每隔5秒检查并解析日志
 
 
 // ========== 初始化和事件绑定 ==========
