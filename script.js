@@ -45,6 +45,10 @@
 
   oldLog('%c已开启 console.log 对象捕获，数据保存在 window.logs', 'color: green');
 
+  // 初始化全局状态
+  window.gameHistory = [];      // 存储开奖历史
+  window.patternStates = {};    // 管理所有牌路的激活状态
+
   // 保存最新的霸天虎状态
   window.bthStatus = {
     period: '',
@@ -68,6 +72,9 @@
       window.bthStatus.time = new Date().toLocaleTimeString();
       console.log(`%c游戏状态: 可以下注`, 'color: green; font-weight: bold');
       updatePanel();
+
+      // 自动下注
+      autoPlaceBets();
     } else if (url.includes('/jiang/封盘.png')) {
       window.bthStatus.gamePhase = '已封盘';
       window.bthStatus.time = new Date().toLocaleTimeString();
@@ -140,6 +147,11 @@
 
       // 立即更新面板
       updatePanel();
+
+      // 自动下注功能：更新历史、检查激活、推进指针
+      updateGameHistory(window.bthStatus.result);
+      checkActivation();
+      advancePointers(window.bthStatus.result);
     }
   }
 
@@ -237,22 +249,304 @@
     document.getElementById('update-time').textContent = bth.time || '-';
   }
 
-  // 下注功能（待用）
-  // function placeBet(message) {
-  //   fetch('http://zzxxyy.shop/doXiazhu.html', {
-  //     method: 'POST',
-  //     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-  //     body: new URLSearchParams({
-  //       message: message
-  //     })
-  //   })
-  //   .then(res => res.json())
-  //   .then(d => {
-  //     if (d.msg === null) d.msg = [];
-  //     console.log(d);
-  //   })
-  //   .catch(error => console.error('下注请求出错:', error));
-  // }
+  // 下注功能
+  function placeBet(message) {
+    fetch('http://zzxxyy.shop/doXiazhu.html', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        message: message
+      })
+    })
+    .then(res => res.json())
+    .then(d => {
+      if (d.msg === null) d.msg = [];
+      console.log('[下注结果]', d);
+    })
+    .catch(error => console.error('下注请求出错:', error));
+  }
+
+  // ========== 自动下注核心功能 ==========
+
+  // 动态获取牌路的总列数
+  function getTotalColumns(patternId, state) {
+    if (state.type === 'preset') {
+      const inputRow = document.getElementById(`input-row-${patternId}`);
+      return inputRow ? inputRow.children.length : 0;
+    } else {
+      const patternDiv = document.getElementById(patternId);
+      if (!patternDiv) return 0;
+      const inputRow = patternDiv.querySelector('div > div > div:nth-child(1)');
+      return inputRow ? inputRow.children.length : 0;
+    }
+  }
+
+  // 更新游戏历史
+  function updateGameHistory(result) {
+    if (!result) return;
+    window.gameHistory.push(result);
+    console.log(`[历史更新] 新增结果: ${result}, 当前历史: ${window.gameHistory.join(',')}`);
+  }
+
+  // 更新牌路UI显示（激活状态和指针位置）
+  function updatePatternUI(patternId, state) {
+    let statusElement;
+
+    if (state.type === 'preset') {
+      // 预设组：在累计盈亏后面添加状态显示
+      const profitSpan = document.getElementById(`profit-preset-${patternId}`);
+      if (!profitSpan) return;
+
+      statusElement = profitSpan.parentElement.querySelector('.activation-status');
+      if (!statusElement) {
+        statusElement = document.createElement('span');
+        statusElement.className = 'activation-status';
+        statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
+        profitSpan.parentElement.appendChild(statusElement);
+      }
+    } else {
+      // 自定义牌路：在标题处显示
+      const patternDiv = document.getElementById(patternId);
+      if (!patternDiv) return;
+
+      const titleDiv = patternDiv.querySelector('div:first-child');
+      statusElement = titleDiv.querySelector('.activation-status');
+      if (!statusElement) {
+        statusElement = document.createElement('span');
+        statusElement.className = 'activation-status';
+        statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
+        titleDiv.appendChild(statusElement);
+      }
+    }
+
+    // 更新显示内容
+    if (state.isActivated) {
+      const rowInfo = state.type === 'preset' ? ` 行${state.activeRowIndex + 1}` : '';
+      statusElement.textContent = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
+      statusElement.style.color = '#4CAF50';
+    } else {
+      statusElement.textContent = '[未激活]';
+      statusElement.style.color = '#999';
+    }
+  }
+
+  // 尝试激活预设组
+  function tryActivatePresetGroup(groupId, state) {
+    const rowCount = state.rowCount;
+
+    // 从上到下遍历每一行
+    for (let row = 0; row < rowCount; row++) {
+      const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
+      const inputRow = document.getElementById(`input-row-${groupId}`);
+
+      if (!selectRow || !inputRow) continue;
+
+      // 找到该行第一个数字不为0的列（入场点）
+      let entryPoint = -1;
+      for (let col = 0; col < inputRow.children.length; col++) {
+        const amount = parseInt(inputRow.children[col].value) || 0;
+        if (amount !== 0) {
+          entryPoint = col;
+          break;
+        }
+      }
+
+      // 如果没有入场点，跳过这一行
+      if (entryPoint === -1) continue;
+
+      // 检查历史是否匹配入场点之前的所有下拉菜单值
+      const requiredHistory = [];
+      for (let col = 0; col < entryPoint; col++) {
+        requiredHistory.push(selectRow.children[col].value);
+      }
+
+      // 历史长度不够，跳过
+      if (window.gameHistory.length < requiredHistory.length) continue;
+
+      // 对比最近的N条历史
+      const recentHistory = window.gameHistory.slice(-requiredHistory.length);
+      const isMatch = requiredHistory.every((val, idx) => val === recentHistory[idx]);
+
+      if (isMatch) {
+        // 激活该行
+        state.isActivated = true;
+        state.activeRowIndex = row;
+        state.currentPointer = entryPoint;
+        console.log(`[激活] 预设组 ${groupId} 第 ${row} 行激活，指针在第 ${entryPoint} 列`);
+        updatePatternUI(groupId, state);
+        return; // 激活第一个满足的行后退出
+      }
+    }
+  }
+
+  // 尝试激活自定义牌路
+  function tryActivateCustomPattern(patternId, state) {
+    const patternDiv = document.getElementById(patternId);
+    if (!patternDiv) return;
+
+    const inputRow = patternDiv.querySelector('div > div > div:nth-child(1)');
+    const selectRow = patternDiv.querySelector('div > div > div:nth-child(2)');
+
+    if (!inputRow || !selectRow) return;
+
+    // 找到第一个数字不为0的列
+    let entryPoint = -1;
+    for (let col = 0; col < inputRow.children.length; col++) {
+      const amount = parseInt(inputRow.children[col].value) || 0;
+      if (amount !== 0) {
+        entryPoint = col;
+        break;
+      }
+    }
+
+    if (entryPoint === -1) return;
+
+    // 检查历史匹配
+    const requiredHistory = [];
+    for (let col = 0; col < entryPoint; col++) {
+      requiredHistory.push(selectRow.children[col].value);
+    }
+
+    if (window.gameHistory.length < requiredHistory.length) return;
+
+    const recentHistory = window.gameHistory.slice(-requiredHistory.length);
+    const isMatch = requiredHistory.every((val, idx) => val === recentHistory[idx]);
+
+    if (isMatch) {
+      state.isActivated = true;
+      state.currentPointer = entryPoint;
+      console.log(`[激活] 自定义牌路 ${patternId} 激活，指针在第 ${entryPoint} 列`);
+      updatePatternUI(patternId, state);
+    }
+  }
+
+  // 检查所有未激活的牌路是否满足激活条件
+  function checkActivation() {
+    for (let patternId in window.patternStates) {
+      const state = window.patternStates[patternId];
+
+      // 跳过已激活的牌路
+      if (state.isActivated) continue;
+
+      // 检查是否勾选
+      const checkbox = document.getElementById(`enable-${patternId}`) ||
+                       document.querySelector(`#${patternId} input[type="checkbox"]`);
+      if (!checkbox || !checkbox.checked) continue;
+
+      // 尝试激活
+      if (state.type === 'preset') {
+        tryActivatePresetGroup(patternId, state);
+      } else {
+        tryActivateCustomPattern(patternId, state);
+      }
+    }
+  }
+
+  // 自动下注
+  function autoPlaceBets() {
+    console.log('[自动下注] 开始检查所有牌路...');
+
+    for (let patternId in window.patternStates) {
+      const state = window.patternStates[patternId];
+
+      // 必须已激活
+      if (!state.isActivated) continue;
+
+      // 必须勾选
+      const checkbox = document.getElementById(`enable-${patternId}`) ||
+                       document.querySelector(`#${patternId} input[type="checkbox"]`);
+      if (!checkbox || !checkbox.checked) continue;
+
+      // 获取当前列的金额和下注类型
+      let amount, betType;
+
+      if (state.type === 'preset') {
+        const inputRow = document.getElementById(`input-row-${patternId}`);
+        const selectRow = document.getElementById(`select-row-${patternId}-${state.activeRowIndex}`);
+
+        if (!inputRow || !selectRow || state.currentPointer >= inputRow.children.length) continue;
+
+        amount = parseInt(inputRow.children[state.currentPointer].value) || 0;
+        betType = selectRow.children[state.currentPointer].value;
+      } else {
+        const patternDiv = document.getElementById(patternId);
+        if (!patternDiv) continue;
+
+        const inputRow = patternDiv.querySelector('div > div > div:nth-child(1)');
+        const selectRow = patternDiv.querySelector('div > div > div:nth-child(2)');
+
+        if (!inputRow || !selectRow || state.currentPointer >= inputRow.children.length) continue;
+
+        amount = parseInt(inputRow.children[state.currentPointer].value) || 0;
+        betType = selectRow.children[state.currentPointer].value;
+      }
+
+      // 金额为0，跳过
+      if (amount === 0) {
+        console.log(`[跳过下注] ${patternId} 第 ${state.currentPointer} 列金额为0`);
+        continue;
+      }
+
+      // 执行下注
+      const message = `${betType}${amount}`;
+      console.log(`[执行下注] ${patternId} 下注: ${message}`);
+      placeBet(message);
+    }
+  }
+
+  // 推进指针逻辑
+  function advancePointers(result) {
+    for (let patternId in window.patternStates) {
+      const state = window.patternStates[patternId];
+
+      // 只处理已激活的牌路
+      if (!state.isActivated) continue;
+
+      // 获取当前指针列的下注类型
+      let expectedBetType;
+
+      if (state.type === 'preset') {
+        const selectRow = document.getElementById(`select-row-${patternId}-${state.activeRowIndex}`);
+        if (!selectRow || state.currentPointer >= selectRow.children.length) continue;
+
+        expectedBetType = selectRow.children[state.currentPointer].value;
+      } else {
+        const patternDiv = document.getElementById(patternId);
+        if (!patternDiv) continue;
+
+        const selectRow = patternDiv.querySelector('div > div > div:nth-child(2)');
+        if (!selectRow || state.currentPointer >= selectRow.children.length) continue;
+
+        expectedBetType = selectRow.children[state.currentPointer].value;
+      }
+
+      // 判断是否匹配
+      if (result === expectedBetType) {
+        // 匹配：指针右移
+        state.currentPointer++;
+
+        // 获取总列数
+        const totalColumns = getTotalColumns(patternId, state);
+
+        // 循环回第一列
+        if (state.currentPointer >= totalColumns) {
+          state.currentPointer = 0;
+          console.log(`[推进] ${patternId} 指针循环回第 0 列`);
+        } else {
+          console.log(`[推进] ${patternId} 指针推进到第 ${state.currentPointer} 列`);
+        }
+
+        updatePatternUI(patternId, state);
+      } else {
+        // 不匹配：取消激活
+        console.log(`[取消激活] ${patternId} 结果不匹配，预期 ${expectedBetType}，实际 ${result}`);
+        state.isActivated = false;
+        state.activeRowIndex = -1;
+        state.currentPointer = -1;
+        updatePatternUI(patternId, state);
+      }
+    }
+  }
 
   // 定时更新面板内容
   setInterval(updatePanel, 5000); // 每5秒更新一次面板
@@ -400,6 +694,16 @@
     document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
       console.log(`预设组 ${groupId} ${e.target.checked ? '已启用' : '已停用'}`);
     });
+
+    // 初始化牌路状态
+    window.patternStates[groupId] = {
+      type: 'preset',
+      isActivated: false,
+      activeRowIndex: -1,
+      currentPointer: -1,
+      rowCount: rowCount
+    };
+    updatePatternUI(groupId, window.patternStates[groupId]);
   }
 
   // 动态添加列到预设组（一次添加1列）
@@ -549,6 +853,16 @@
     patternDiv.appendChild(titleDiv);
     patternDiv.appendChild(contentDiv);
     container.appendChild(patternDiv);
+
+    // 初始化牌路状态
+    window.patternStates[`pattern-${patternId}`] = {
+      type: 'custom',
+      isActivated: false,
+      activeRowIndex: -1,
+      currentPointer: -1,
+      rowCount: 1
+    };
+    updatePatternUI(`pattern-${patternId}`, window.patternStates[`pattern-${patternId}`]);
   }
 
   // 新增牌路按钮事件
