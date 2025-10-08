@@ -1,11 +1,40 @@
 const fs = require('fs');
+const path = require('path');
 
 console.log('🚀 开始构建...\n');
 
+// ========== Step 0: 合并模块文件 ==========
+console.log('🔨 Step 0: 合并模块文件...');
+
+// 定义模块加载顺序
+const moduleFiles = [
+  'src/core.js',
+  'src/storage.js',
+  'src/ui.js',
+  'src/betting.js',
+  'src/patterns/preset.js',
+  'src/patterns/custom.js',
+  'src/game-parser.js',
+  'src/init.js'
+];
+
+// 读取并合并所有模块
+let combinedScript = '';
+moduleFiles.forEach(file => {
+  const content = fs.readFileSync(file, 'utf8');
+  combinedScript += content + '\n\n';
+  console.log(`   ✅ 已加载: ${file}`);
+});
+
+// 包裹在 IIFE 中
+const scriptContent = `(function () {\n${combinedScript}})();`;
+
+// 写入到 script.js
+fs.writeFileSync('script.js', scriptContent);
+console.log(`   ✅ 已生成 script.js (${(scriptContent.length / 1024).toFixed(2)} KB)\n`);
+
 // ========== Step 1: 生成 Bookmarklet ==========
 console.log('📦 Step 1: 生成 Bookmarklet...');
-
-const scriptContent = fs.readFileSync('script.js', 'utf8');
 
 // URL 编码（保留原始脚本用于调试）
 fs.writeFileSync('bookmarklet-raw.txt', `javascript:${scriptContent}`);
