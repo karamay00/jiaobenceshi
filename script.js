@@ -354,7 +354,7 @@
       statusElement.style.color = '#4CAF50';
     } else {
       statusElement.textContent = '[未激活]';
-      statusElement.style.color = '#999';
+      statusElement.style.color = '#fff';
     }
   }
 
@@ -516,7 +516,7 @@
       // 执行下注
       const message = `${betType}${amount}`;
       console.log(`[执行下注] ${patternId} 下注: ${message}`);
-      placeBet(message);
+      // placeBet(message); // 已注释：测试时不实际发送下注请求
     }
   }
 
@@ -647,9 +647,10 @@
   ];
 
   // 创建预设牌路组
-  function createPresetPatternGroup(config) {
+  function createPresetPatternGroup(config, initialData = null) {
     const { name, patterns } = config;
-    const groupId = patternIdCounter++;
+    const groupId = initialData ? initialData.id : patternIdCounter++;
+    if (!initialData) patternIdCounter = groupId + 1;
     const container = document.getElementById('pattern-container');
 
     const rowCount = patterns.length;              // 行数
@@ -712,24 +713,56 @@
     groupDiv.appendChild(controlBar);
     container.appendChild(groupDiv);
 
+    // 如果有初始数据，添加额外的列并填充金额
+    if (initialData && initialData.amounts) {
+      const targetColCount = initialData.amounts.length;
+
+      // 添加额外的列
+      while (inputRow.children.length < targetColCount) {
+        addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns);
+      }
+
+      // 填充金额值
+      for (let i = 0; i < inputRow.children.length && i < initialData.amounts.length; i++) {
+        inputRow.children[i].value = initialData.amounts[i];
+      }
+
+      // 设置复选框状态
+      const checkbox = document.getElementById(`enable-${groupId}`);
+      if (checkbox) {
+        checkbox.checked = initialData.enabled || false;
+      }
+    }
+
     // 绑定事件
     document.getElementById(`add-col-${groupId}`).addEventListener('click', () => {
       addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns);
+      savePatterns(); // 自动保存
     });
 
     document.getElementById(`delete-col-${groupId}`).addEventListener('click', () => {
       deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCount);
+      savePatterns(); // 自动保存
     });
 
     document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
       const isEnabled = e.target.checked;
       console.log(`预设组 ${groupId} ${isEnabled ? '已启用' : '已停用'}`);
       togglePresetGroupInteraction(groupId, isEnabled);
+      savePatterns(); // 自动保存
+    });
+
+    // 为所有输入框添加自动保存
+    const inputs = inputRow.querySelectorAll('input[type="number"]');
+    inputs.forEach(input => {
+      input.addEventListener('change', () => savePatterns());
     });
 
     // 初始化牌路状态
+    const configIndex = PRESET_CONFIGS.findIndex(c => c.name === config.name);
     window.patternStates[groupId] = {
       type: 'preset',
+      configIndex: configIndex,
       isActivated: false,
       activeRowIndex: -1,
       currentPointer: -1,
@@ -743,7 +776,9 @@
     const inputRow = document.getElementById(`input-row-${groupId}`);
 
     // 添加输入框
-    inputRow.appendChild(createAmountInput());
+    const newInput = createAmountInput();
+    newInput.addEventListener('change', () => savePatterns());
+    inputRow.appendChild(newInput);
 
     // 计算当前新增列的索引位置
     const currentColIndex = inputRow.children.length - 1;
@@ -797,9 +832,86 @@
   // 牌路管理
   let patternIdCounter = 0;
 
+  // 保存所有牌路配置到 localStorage
+  function savePatterns() {
+    const patterns = [];
+
+    // 遍历所有牌路状态
+    for (let patternId in window.patternStates) {
+      const state = window.patternStates[patternId];
+
+      if (state.type === 'preset') {
+        // 预设组
+        const inputRow = document.getElementById(`input-row-${patternId}`);
+        const checkbox = document.getElementById(`enable-${patternId}`);
+
+        if (!inputRow) continue;
+
+        const amounts = [];
+        for (let i = 0; i < inputRow.children.length; i++) {
+          amounts.push(parseInt(inputRow.children[i].value) || 0);
+        }
+
+        patterns.push({
+          id: parseInt(patternId),
+          type: 'preset',
+          configIndex: state.configIndex || 0,
+          amounts: amounts,
+          enabled: checkbox ? checkbox.checked : false
+        });
+      } else {
+        // 自定义牌路
+        const inputRow = document.getElementById(`input-row-custom-${patternId}`);
+        const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+        const checkbox = document.getElementById(`enable-custom-${patternId}`);
+
+        if (!inputRow || !selectRow) continue;
+
+        const columns = [];
+        for (let i = 0; i < inputRow.children.length; i++) {
+          columns.push({
+            amount: parseInt(inputRow.children[i].value) || 0,
+            betType: selectRow.children[i].value
+          });
+        }
+
+        patterns.push({
+          id: parseInt(patternId),
+          type: 'custom',
+          columns: columns,
+          enabled: checkbox ? checkbox.checked : false
+        });
+      }
+    }
+
+    const data = {
+      nextId: patternIdCounter,
+      patterns: patterns
+    };
+
+    localStorage.setItem('batian_patterns', JSON.stringify(data));
+    console.log('[保存配置] 已保存', patterns.length, '个牌路');
+  }
+
+  // 从 localStorage 加载牌路配置
+  function loadPatterns() {
+    try {
+      const saved = localStorage.getItem('batian_patterns');
+      if (!saved) return null;
+
+      const data = JSON.parse(saved);
+      console.log('[加载配置] 找到', data.patterns.length, '个牌路');
+      return data;
+    } catch (e) {
+      console.error('[加载配置] 解析失败:', e);
+      return null;
+    }
+  }
+
   // 创建牌路元素
-  function createPattern() {
-    const patternId = patternIdCounter++;
+  function createPattern(initialData = null) {
+    const patternId = initialData ? initialData.id : patternIdCounter++;
+    if (!initialData) patternIdCounter = patternId + 1;
     const container = document.getElementById('pattern-container');
 
     const patternDiv = document.createElement('div');
@@ -846,24 +958,61 @@
     patternDiv.appendChild(controlBar);
     container.appendChild(patternDiv);
 
+    // 如果有初始数据，添加额外的列并填充值
+    if (initialData && initialData.columns) {
+      const targetColCount = initialData.columns.length;
+
+      // 添加额外的列
+      while (row1.children.length < targetColCount) {
+        addColumnToCustomPattern(patternId);
+      }
+
+      // 填充金额和下注类型
+      for (let i = 0; i < initialData.columns.length; i++) {
+        const col = initialData.columns[i];
+        if (row1.children[i]) row1.children[i].value = col.amount;
+        if (row2.children[i]) row2.children[i].value = col.betType;
+      }
+
+      // 设置复选框状态
+      const checkbox = document.getElementById(`enable-custom-${patternId}`);
+      if (checkbox) {
+        checkbox.checked = initialData.enabled || false;
+      }
+    }
+
     // 绑定事件
     document.getElementById(`add-col-custom-${patternId}`).addEventListener('click', () => {
       addColumnToCustomPattern(patternId);
+      savePatterns(); // 自动保存
     });
 
     document.getElementById(`delete-col-custom-${patternId}`).addEventListener('click', () => {
       deleteLastColumnFromCustomPattern(patternId);
+      savePatterns(); // 自动保存
     });
 
     document.getElementById(`enable-custom-${patternId}`).addEventListener('change', (e) => {
       const isEnabled = e.target.checked;
       console.log(`自定义牌路 ${patternId} ${isEnabled ? '已启用' : '已停用'}`);
       toggleCustomPatternInteraction(patternId, isEnabled);
+      savePatterns(); // 自动保存
     });
 
     document.getElementById(`delete-pattern-${patternId}`).addEventListener('click', () => {
       patternDiv.remove();
       delete window.patternStates[`pattern-${patternId}`];
+      savePatterns(); // 自动保存
+    });
+
+    // 为所有输入框和下拉菜单添加自动保存
+    const inputs = row1.querySelectorAll('input[type="number"]');
+    const selects = row2.querySelectorAll('select');
+    inputs.forEach(input => {
+      input.addEventListener('change', () => savePatterns());
+    });
+    selects.forEach(select => {
+      select.addEventListener('change', () => savePatterns());
     });
 
     // 初始化牌路状态
@@ -883,10 +1032,14 @@
     const selectRow = document.getElementById(`select-row-custom-${patternId}`);
 
     // 添加输入框
-    inputRow.appendChild(createAmountInput());
+    const newInput = createAmountInput();
+    newInput.addEventListener('change', () => savePatterns());
+    inputRow.appendChild(newInput);
 
     // 添加下拉菜单
-    selectRow.appendChild(createBetSelect('庄', true));
+    const newSelect = createBetSelect('庄', true);
+    newSelect.addEventListener('change', () => savePatterns());
+    selectRow.appendChild(newSelect);
 
     // 启用删除按钮
     const deleteBtn = document.getElementById(`delete-col-custom-${patternId}`);
@@ -1001,7 +1154,28 @@
     }
   });
 
-  // 初始化预设牌路组
-  createPresetPatternGroup(PRESET_CONFIGS[0]);
-  createPresetPatternGroup(PRESET_CONFIGS[1]);
+  // 初始化牌路：尝试加载保存的配置，如果没有则创建默认配置
+  const savedData = loadPatterns();
+  if (savedData && savedData.patterns && savedData.patterns.length > 0) {
+    // 恢复保存的配置
+    patternIdCounter = savedData.nextId || savedData.patterns.length;
+
+    savedData.patterns.forEach(pattern => {
+      if (pattern.type === 'preset') {
+        const config = PRESET_CONFIGS[pattern.configIndex || 0];
+        if (config) {
+          createPresetPatternGroup(config, pattern);
+        }
+      } else if (pattern.type === 'custom') {
+        createPattern(pattern);
+      }
+    });
+
+    console.log('[初始化] 已恢复', savedData.patterns.length, '个牌路');
+  } else {
+    // 创建默认的预设组
+    createPresetPatternGroup(PRESET_CONFIGS[0]);
+    createPresetPatternGroup(PRESET_CONFIGS[1]);
+    console.log('[初始化] 已创建默认预设组');
+  }
 })();
