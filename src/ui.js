@@ -16,7 +16,7 @@ const panelHtml = `
         <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
         <div>🕐 <strong>更新：</strong><span id="update-time">-</span></div>
-        <div style="grid-column: 1 / -1; font-size: 11px; color: black; display: flex; align-items: center; gap: 5px;">
+        <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
           <span style="flex-shrink: 0;">📜 <strong>历史：</strong></span>
           <span id="game-history" style="flex: 1; overflow-x: auto; white-space: nowrap;">-</span>
         </div>
