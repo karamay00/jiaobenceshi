@@ -277,7 +277,9 @@ function autoPlaceBets() {
     }
 
     // 执行下注
-    const message = `${betType}${amount}`;
+    // 将"閒"转换为"闲"用于服务器下注，庄保持不变
+    const serverBetType = betType === '閒' ? '闲' : betType;
+    const message = `${serverBetType}${amount}`;
 
     // 生成牌路描述
     let patternDesc;
