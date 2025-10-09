@@ -11,7 +11,7 @@ const panelHtml = `
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
       <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
         <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
-        <div>📊 <strong>期数：</strong><span id="period">-</span> - <strong>结果：</strong><span id="game-result">-</span></div>
+        <div>📊 <span id="period">-</span><span id="game-result">-</span></div>
         <div>💰 <strong>状态：</strong><span id="status">-</span></div>
         <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
@@ -87,8 +87,8 @@ function updatePanel() {
     gamePhaseSpan.style.fontWeight = 'normal';
   }
 
-  document.getElementById('period').textContent = bth.period || '-';
-  document.getElementById('game-result').textContent = (bth.result || '-') + (bth.resultNumber || '');
+  document.getElementById('period').textContent = (bth.period ? bth.period + '期' : '-');
+  document.getElementById('game-result').textContent = (bth.result || '') + (bth.resultNumber || '');
 
   const statusSpan = document.getElementById('status');
   statusSpan.textContent = bth.status || '-';
