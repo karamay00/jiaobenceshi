@@ -143,6 +143,10 @@ function createPresetPatternGroup(config, initialData = null) {
     const checkbox = document.getElementById(`enable-${groupId}`);
     if (checkbox) {
       checkbox.checked = initialData.enabled || false;
+      // 如果已启用，则禁用交互
+      if (initialData.enabled) {
+        togglePresetGroupInteraction(groupId, true);
+      }
     }
   }
 

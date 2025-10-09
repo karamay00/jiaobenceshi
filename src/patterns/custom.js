@@ -70,6 +70,10 @@ function createPattern(initialData = null) {
     const checkbox = document.getElementById(`enable-custom-${patternId}`);
     if (checkbox) {
       checkbox.checked = initialData.enabled || false;
+      // 如果已启用，则禁用交互
+      if (initialData.enabled) {
+        toggleCustomPatternInteraction(patternId, true);
+      }
     }
   }
 
