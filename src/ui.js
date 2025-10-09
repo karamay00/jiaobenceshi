@@ -11,8 +11,7 @@ const panelHtml = `
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
       <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
         <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
-        <div>📊 <strong>期数：</strong><span id="period">-</span></div>
-        <div>🎲 <strong>结果：</strong><span id="game-result">-</span></div>
+        <div>📊 <strong>期数：</strong><span id="period">-</span> - <strong>结果：</strong><span id="game-result">-</span></div>
         <div>💰 <strong>状态：</strong><span id="status">-</span></div>
         <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
