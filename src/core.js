@@ -32,7 +32,7 @@ console.log = function (...args) {
 
         // 立即检查是否是开奖消息并解析
         if (a.msg && Array.isArray(a.msg) && a.msg[0] && a.msg[0].includes('期结果')) {
-          setTimeout(() => parseDataAndDisplay(a), 100); // 延迟100ms解析，确保已添加到logs
+          parseDataAndDisplay(a); // 立即解析，确保历史数据在下注前更新
         }
       } catch (e) {
         oldLog('[无法序列化对象]', a);
