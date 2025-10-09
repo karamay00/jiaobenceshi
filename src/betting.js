@@ -37,10 +37,10 @@ function updateGameHistory(result) {
 
 // 更新牌路UI显示（激活状态和指针位置）
 function updatePatternUI(patternId, state) {
-  let statusElement;
+  let statusElement, collapsedStatusElement;
 
   if (state.type === 'preset') {
-    // 预设组：在累计盈亏后面添加状态显示
+    // 预设组：在累计盈亏后面添加状态显示（展开容器）
     const profitSpan = document.getElementById(`profit-preset-${patternId}`);
     if (!profitSpan) return;
 
@@ -51,29 +51,47 @@ function updatePatternUI(patternId, state) {
       statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
       profitSpan.parentElement.appendChild(statusElement);
     }
-  } else {
-    // 自定义牌路：在标题处显示
-    const patternDiv = document.getElementById(patternId);
-    if (!patternDiv) return;
 
-    const titleDiv = patternDiv.querySelector('div:first-child');
-    statusElement = titleDiv.querySelector('.activation-status');
+    // 概览容器中的状态显示
+    collapsedStatusElement = document.getElementById(`status-collapsed-preset-${patternId}`);
+  } else {
+    // 自定义牌路：在盈亏信息后面添加状态显示（展开容器）
+    const profitSpan = document.getElementById(`profit-${patternId}`);
+    if (!profitSpan) return;
+
+    statusElement = profitSpan.parentElement.querySelector('.activation-status');
     if (!statusElement) {
       statusElement = document.createElement('span');
       statusElement.className = 'activation-status';
       statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
-      titleDiv.appendChild(statusElement);
+      profitSpan.parentElement.appendChild(statusElement);
     }
+
+    // 概览容器中的状态显示
+    collapsedStatusElement = document.getElementById(`status-collapsed-custom-${patternId}`);
   }
 
-  // 更新显示内容
+  // 更新显示内容（展开容器和概览容器）
   if (state.isActivated) {
     const rowInfo = state.type === 'preset' ? ` 行${state.activeRowIndex + 1}` : '';
-    statusElement.textContent = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
+    const expandedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
+    const collapsedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
+
+    statusElement.textContent = expandedText;
     statusElement.style.color = '#4CAF50';
+
+    if (collapsedStatusElement) {
+      collapsedStatusElement.textContent = collapsedText;
+      collapsedStatusElement.style.color = '#4CAF50';
+    }
   } else {
     statusElement.textContent = '[未激活]';
     statusElement.style.color = '#fff';
+
+    if (collapsedStatusElement) {
+      collapsedStatusElement.textContent = '[未激活]';
+      collapsedStatusElement.style.color = '#fff';
+    }
   }
 
   // 高亮当前激活位置的下拉菜单

@@ -8,12 +8,7 @@ function createPattern(initialData = null) {
 
   const patternDiv = document.createElement('div');
   patternDiv.id = `pattern-${patternId}`;
-  patternDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 5px;';
-
-  // 创建标题
-  const titleDiv = document.createElement('div');
-  titleDiv.style.cssText = 'color: white; font-size: 12px; margin-bottom: 5px;';
-  titleDiv.innerHTML = `本牌路累计盈亏：<span id="profit-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span>`;
+  patternDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 2px; border-radius: 5px;';
 
   // 创建表格容器
   const tableContainer = document.createElement('div');
@@ -34,21 +29,18 @@ function createPattern(initialData = null) {
   tableContainer.appendChild(row1);
   tableContainer.appendChild(row2);
 
-  // 底部控制栏
+  // 底部控制栏（包含折叠按钮和盈亏信息）
   const controlBar = document.createElement('div');
   controlBar.style.cssText = 'margin-top: 10px; display: flex; align-items: center; gap: 10px; color: white; font-size: 12px;';
   controlBar.innerHTML = `
+    <button id="toggle-expand-custom-${patternId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▼</button>
+    <span style="flex: 1;">本牌路累计盈亏：<span id="profit-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     <button id="add-col-custom-${patternId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
     <button id="delete-col-custom-${patternId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
     <input type="checkbox" id="enable-custom-${patternId}" style="width: 20px; height: 20px; cursor: pointer;">
     <label for="enable-custom-${patternId}" style="cursor: pointer;">启用</label>
     <button id="delete-pattern-${patternId}" style="margin-left: auto; padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">×删除牌路</button>
   `;
-
-  patternDiv.appendChild(titleDiv);
-  patternDiv.appendChild(tableContainer);
-  patternDiv.appendChild(controlBar);
-  container.appendChild(patternDiv);
 
   // 如果有初始数据，添加额外的列并填充值
   if (initialData && initialData.columns) {
@@ -80,6 +72,64 @@ function createPattern(initialData = null) {
       }
     }
   }
+
+  // 获取前6个牌型用于预览（带颜色）
+  const patternPreview = Array.from(row2.children)
+    .slice(0, 6)
+    .map(select => {
+      const val = select.value;
+      const color = val === '庄' ? 'red' : 'blue';
+      return `<span style="color: ${color};">${val}</span>`;
+    })
+    .join('');
+
+  // 创建展开容器（默认显示）
+  const expandedContainer = document.createElement('div');
+  expandedContainer.id = `expanded-custom-${patternId}`;
+  expandedContainer.style.cssText = 'display: block;';
+  expandedContainer.appendChild(tableContainer);
+  expandedContainer.appendChild(controlBar);
+
+  // 创建概览容器（默认隐藏）
+  const collapsedContainer = document.createElement('div');
+  collapsedContainer.id = `collapsed-custom-${patternId}`;
+  collapsedContainer.style.cssText = 'display: none; padding: 10px 0; color: white; font-size: 12px;';
+  collapsedContainer.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button id="toggle-collapse-custom-${patternId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▲</button>
+      <span style="font-weight: bold;">${patternPreview}</span>
+      <span id="status-collapsed-custom-${patternId}" style="color: #fff;">[未激活]</span>
+      <span style="flex: 1; text-align: right;">本牌路累计盈亏：<span id="profit-collapsed-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
+    </div>
+  `;
+
+  patternDiv.appendChild(expandedContainer);
+  patternDiv.appendChild(collapsedContainer);
+  container.appendChild(patternDiv);
+
+  // 绑定折叠按钮事件
+  document.getElementById(`toggle-expand-custom-${patternId}`).addEventListener('click', () => {
+    const expanded = document.getElementById(`expanded-custom-${patternId}`);
+    const collapsed = document.getElementById(`collapsed-custom-${patternId}`);
+
+    // 同步盈亏数据
+    const profitValue = document.getElementById(`profit-${patternId}`).textContent;
+    document.getElementById(`profit-collapsed-${patternId}`).textContent = profitValue;
+    document.getElementById(`profit-collapsed-${patternId}`).style.color = document.getElementById(`profit-${patternId}`).style.color;
+
+    // 收起
+    expanded.style.display = 'none';
+    collapsed.style.display = 'block';
+  });
+
+  document.getElementById(`toggle-collapse-custom-${patternId}`).addEventListener('click', () => {
+    const expanded = document.getElementById(`expanded-custom-${patternId}`);
+    const collapsed = document.getElementById(`collapsed-custom-${patternId}`);
+
+    // 展开
+    expanded.style.display = 'block';
+    collapsed.style.display = 'none';
+  });
 
   // 绑定事件
   console.log(`[创建牌路] patternId=${patternId}, initialData?.id=${initialData?.id}, window.patternIdCounter=${window.patternIdCounter}, 按钮ID=add-col-custom-${patternId}`);

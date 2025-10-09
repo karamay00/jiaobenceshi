@@ -75,7 +75,7 @@ function createPresetPatternGroup(config, initialData = null) {
   // 创建组容器
   const groupDiv = document.createElement('div');
   groupDiv.id = `preset-group-${groupId}`;
-  groupDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 10px; border-radius: 5px;';
+  groupDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 2px; border-radius: 5px;';
 
   // 创建表格容器
   const tableContainer = document.createElement('div');
@@ -110,10 +110,19 @@ function createPresetPatternGroup(config, initialData = null) {
   tableContainer.appendChild(inputRow);
   selectRows.forEach(row => tableContainer.appendChild(row));
 
-  // 底部控制栏
+  // 获取第一行前6个牌型用于预览（带颜色）
+  const patternPreview = duplicatedPatterns[0].slice(0, 6)
+    .map(val => {
+      const color = val === '庄' ? 'red' : 'blue';
+      return `<span style="color: ${color};">${val}</span>`;
+    })
+    .join('');
+
+  // 底部控制栏（在最左边添加折叠按钮）
   const controlBar = document.createElement('div');
   controlBar.style.cssText = 'margin-top: 10px; display: flex; align-items: center; gap: 10px; color: white; font-size: 12px;';
   controlBar.innerHTML = `
+    <button id="toggle-expand-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▼</button>
     <span style="flex: 1;">本组累计盈亏：<span id="profit-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     <button id="add-col-${groupId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
     <button id="delete-col-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
@@ -121,8 +130,28 @@ function createPresetPatternGroup(config, initialData = null) {
     <label for="enable-${groupId}" style="cursor: pointer;">启用</label>
   `;
 
-  groupDiv.appendChild(tableContainer);
-  groupDiv.appendChild(controlBar);
+  // 创建展开容器（默认显示）
+  const expandedContainer = document.createElement('div');
+  expandedContainer.id = `expanded-preset-${groupId}`;
+  expandedContainer.style.cssText = 'display: block;';
+  expandedContainer.appendChild(tableContainer);
+  expandedContainer.appendChild(controlBar);
+
+  // 创建概览容器（默认隐藏）
+  const collapsedContainer = document.createElement('div');
+  collapsedContainer.id = `collapsed-preset-${groupId}`;
+  collapsedContainer.style.cssText = 'display: none; padding: 10px 0; color: white; font-size: 12px;';
+  collapsedContainer.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <button id="toggle-collapse-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▲</button>
+      <span style="font-weight: bold;">${patternPreview}</span>
+      <span id="status-collapsed-preset-${groupId}" style="color: #fff;">[未激活]</span>
+      <span style="flex: 1; text-align: right;">本组累计盈亏：<span id="profit-collapsed-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
+    </div>
+  `;
+
+  groupDiv.appendChild(expandedContainer);
+  groupDiv.appendChild(collapsedContainer);
   container.appendChild(groupDiv);
 
   // 如果有初始数据，添加额外的列并填充金额
@@ -149,6 +178,30 @@ function createPresetPatternGroup(config, initialData = null) {
       }
     }
   }
+
+  // 绑定折叠按钮事件
+  document.getElementById(`toggle-expand-preset-${groupId}`).addEventListener('click', () => {
+    const expanded = document.getElementById(`expanded-preset-${groupId}`);
+    const collapsed = document.getElementById(`collapsed-preset-${groupId}`);
+
+    // 同步盈亏数据
+    const profitValue = document.getElementById(`profit-preset-${groupId}`).textContent;
+    document.getElementById(`profit-collapsed-preset-${groupId}`).textContent = profitValue;
+    document.getElementById(`profit-collapsed-preset-${groupId}`).style.color = document.getElementById(`profit-preset-${groupId}`).style.color;
+
+    // 收起
+    expanded.style.display = 'none';
+    collapsed.style.display = 'block';
+  });
+
+  document.getElementById(`toggle-collapse-preset-${groupId}`).addEventListener('click', () => {
+    const expanded = document.getElementById(`expanded-preset-${groupId}`);
+    const collapsed = document.getElementById(`collapsed-preset-${groupId}`);
+
+    // 展开
+    expanded.style.display = 'block';
+    collapsed.style.display = 'none';
+  });
 
   // 绑定事件
   document.getElementById(`add-col-${groupId}`).addEventListener('click', () => {
