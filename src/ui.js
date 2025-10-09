@@ -11,11 +11,12 @@ const panelHtml = `
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
       <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
         <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
-        <div>📊 <span id="period">-</span><span id="game-result">-</span></div>
+        <div>📊 <strong>结果：</strong><span id="period">-</span><span id="game-result">-</span></div>
         <div>💰 <strong>状态：</strong><span id="status">-</span></div>
         <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
-        <div style="grid-column: 1 / -1; font-size: 11px; color: black;">🕐 <span id="update-time">-</span></div>
+        <div>🕐 <strong>更新：</strong><span id="update-time">-</span></div>
+        <div style="grid-column: 1 / -1; font-size: 11px; color: black; overflow-x: auto; white-space: nowrap;">📜 <strong>历史：</strong><span id="game-history">-</span></div>
       </div>
       <div style="display: flex; gap: 5px; margin-bottom: 10px;">
         <button id="add-pattern" style="flex: 1; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
@@ -121,6 +122,14 @@ function updatePanel() {
 
   document.getElementById('total-score').textContent = bth.totalScore || '-';
   document.getElementById('update-time').textContent = bth.time || '-';
+
+  // 更新历史牌路
+  const historySpan = document.getElementById('game-history');
+  if (window.gameHistory && window.gameHistory.length > 0) {
+    historySpan.textContent = window.gameHistory.join(' ');
+  } else {
+    historySpan.textContent = '-';
+  }
 }
 
 // 定时更新面板内容
