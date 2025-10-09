@@ -140,11 +140,11 @@ function createPresetPatternGroup(config, initialData = null) {
   // 创建概览容器（默认隐藏）
   const collapsedContainer = document.createElement('div');
   collapsedContainer.id = `collapsed-preset-${groupId}`;
-  collapsedContainer.style.cssText = 'display: none; padding: 10px 0; color: white; font-size: 12px;';
+  collapsedContainer.style.cssText = 'display: none; padding: 2px 0; color: white; font-size: 12px;';
   collapsedContainer.innerHTML = `
     <div style="display: flex; align-items: center; gap: 8px;">
       <button id="toggle-collapse-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▲</button>
-      <span style="font-weight: bold;">${patternPreview}</span>
+      <span style="font-weight: bold; -webkit-text-stroke: 1px white; text-stroke: 1px white;">${patternPreview}</span>
       <span id="status-collapsed-preset-${groupId}" style="color: #fff;">[未激活]</span>
       <span style="flex: 1; text-align: right;">本组累计盈亏：<span id="profit-collapsed-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     </div>
