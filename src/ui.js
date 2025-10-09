@@ -61,6 +61,8 @@ style.textContent = `
   #custom-panel.collapsed {
     width: 40px !important;
     height: 40px !important;
+    min-width: 40px !important;
+    min-height: 40px !important;
     padding: 0 !important;
     border-radius: 50% !important;
   }
