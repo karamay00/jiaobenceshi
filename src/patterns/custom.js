@@ -2,8 +2,8 @@
 
 // 创建牌路元素
 function createPattern(initialData = null) {
-  const patternId = initialData ? initialData.id : patternIdCounter++;
-  if (!initialData) patternIdCounter = patternId + 1;
+  const patternId = initialData ? initialData.id : patternIdCounter;
+  if (!initialData) patternIdCounter++;
   const container = document.getElementById('pattern-container');
 
   const patternDiv = document.createElement('div');
