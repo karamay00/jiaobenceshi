@@ -239,7 +239,7 @@ function checkActivation() {
     // 检查是否勾选
     const checkbox = state.type === 'preset'
       ? document.getElementById(`enable-${patternId}`)
-      : document.getElementById(`enable-custom-${patternId}`);
+      : document.getElementById(`enable-custom-${patternId.replace('pattern-', '')}`);
     if (!checkbox || !checkbox.checked) continue;
 
     // 尝试激活
@@ -264,7 +264,7 @@ function autoPlaceBets() {
     // 必须勾选
     const checkbox = state.type === 'preset'
       ? document.getElementById(`enable-${patternId}`)
-      : document.getElementById(`enable-custom-${patternId}`);
+      : document.getElementById(`enable-custom-${patternId.replace('pattern-', '')}`);
     if (!checkbox || !checkbox.checked) continue;
 
     // 获取当前列的金额和下注类型
