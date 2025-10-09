@@ -23,7 +23,7 @@ function getTotalColumns(patternId, state) {
     const inputRow = document.getElementById(`input-row-${patternId}`);
     return inputRow ? inputRow.children.length : 0;
   } else {
-    const inputRow = document.getElementById(`input-row-custom-${patternId}`);
+    const inputRow = document.getElementById(`input-row-custom-${patternId.replace('pattern-', '')}`);
     return inputRow ? inputRow.children.length : 0;
   }
 }
@@ -56,7 +56,7 @@ function updatePatternUI(patternId, state) {
     collapsedStatusElement = document.getElementById(`status-collapsed-preset-${patternId}`);
   } else {
     // 自定义牌路：在盈亏信息后面添加状态显示（展开容器）
-    const profitSpan = document.getElementById(`profit-${patternId}`);
+    const profitSpan = document.getElementById(`profit-${patternId.replace('pattern-', '')}`);
     if (!profitSpan) return;
 
     statusElement = profitSpan.parentElement.querySelector('.activation-status');
@@ -68,7 +68,7 @@ function updatePatternUI(patternId, state) {
     }
 
     // 概览容器中的状态显示
-    collapsedStatusElement = document.getElementById(`status-collapsed-custom-${patternId}`);
+    collapsedStatusElement = document.getElementById(`status-collapsed-custom-${patternId.replace('pattern-', '')}`);
   }
 
   // 更新显示内容（展开容器和概览容器）
@@ -119,7 +119,7 @@ function updatePatternUI(patternId, state) {
     }
   } else {
     // 自定义牌路：清除所有高亮
-    const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+    const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
     if (selectRow) {
       Array.from(selectRow.children).forEach(select => {
         select.style.border = '1px solid #ccc';
@@ -191,8 +191,8 @@ function tryActivatePresetGroup(groupId, state) {
 
 // 尝试激活自定义牌路
 function tryActivateCustomPattern(patternId, state) {
-  const inputRow = document.getElementById(`input-row-custom-${patternId}`);
-  const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+  const inputRow = document.getElementById(`input-row-custom-${patternId.replace('pattern-', '')}`);
+  const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
 
   if (!inputRow || !selectRow) return;
 
@@ -279,8 +279,8 @@ function autoPlaceBets() {
       amount = parseInt(inputRow.children[state.currentPointer].value) || 0;
       betType = selectRow.children[state.currentPointer].value;
     } else {
-      const inputRow = document.getElementById(`input-row-custom-${patternId}`);
-      const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+      const inputRow = document.getElementById(`input-row-custom-${patternId.replace('pattern-', '')}`);
+      const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
 
       if (!inputRow || !selectRow || state.currentPointer >= inputRow.children.length) continue;
 
@@ -337,7 +337,7 @@ function advancePointers(result) {
 
       expectedBetType = selectRow.children[state.currentPointer].value;
     } else {
-      const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+      const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
       if (!selectRow || state.currentPointer >= selectRow.children.length) continue;
 
       expectedBetType = selectRow.children[state.currentPointer].value;
