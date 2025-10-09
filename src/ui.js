@@ -88,7 +88,7 @@ function updatePanel() {
     gamePhaseSpan.style.fontWeight = 'normal';
   }
 
-  document.getElementById('period').textContent = (bth.period ? bth.period + '期' : '-');
+  document.getElementById('period').textContent = (bth.period ? '第' + bth.period + '期 ' : '-');
   document.getElementById('game-result').textContent = (bth.result || '') + (bth.resultNumber || '');
 
   const statusSpan = document.getElementById('status');

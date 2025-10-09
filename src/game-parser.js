@@ -34,7 +34,10 @@ function parseDataAndDisplay(logData) {
     if (!periodResult.includes('期结果')) return; // 如果不是期数结果消息，跳过
 
     const periodMatch = periodResult.split('：');
-    const period = periodMatch[0]; // 期号
+    const periodRaw = periodMatch[0]; // 原始期号文本（如 "5期结果"）
+    // 从期号文本中提取纯数字（如 "5"）
+    const periodNumber = periodRaw.match(/\d+/);
+    const period = periodNumber ? periodNumber[0] : periodRaw;
     const resultRaw = periodMatch[1]; // 结果
     const result = resultRaw ? resultRaw.charAt(0) : resultRaw; // 只取第一个字（閒 或 庄）
     const numberMatch = resultRaw ? resultRaw.match(/\d+/) : null; // 提取数字
