@@ -1,7 +1,7 @@
 // ========== 配置保存和加载 ==========
 
-// 牌路ID计数器
-let patternIdCounter = 0;
+// 牌路ID计数器（全局变量，确保模块间可访问）
+window.patternIdCounter = 0;
 
 // 保存所有牌路配置到 localStorage
 function savePatterns() {
@@ -56,7 +56,7 @@ function savePatterns() {
   }
 
   const data = {
-    nextId: patternIdCounter,
+    nextId: window.patternIdCounter,
     patterns: patterns
   };
 

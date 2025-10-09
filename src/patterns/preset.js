@@ -61,8 +61,8 @@ const PRESET_CONFIGS = [
 // 创建预设牌路组
 function createPresetPatternGroup(config, initialData = null) {
   const { name, patterns } = config;
-  const groupId = initialData ? initialData.id : patternIdCounter;
-  if (!initialData) patternIdCounter++;
+  const groupId = initialData ? initialData.id : window.patternIdCounter;
+  if (!initialData) window.patternIdCounter++;
   const container = document.getElementById('pattern-container');
 
   const rowCount = patterns.length;              // 行数

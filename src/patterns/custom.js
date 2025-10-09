@@ -2,8 +2,8 @@
 
 // 创建牌路元素
 function createPattern(initialData = null) {
-  const patternId = initialData ? initialData.id : patternIdCounter;
-  if (!initialData) patternIdCounter++;
+  const patternId = initialData ? initialData.id : window.patternIdCounter;
+  if (!initialData) window.patternIdCounter++;
   const container = document.getElementById('pattern-container');
 
   const patternDiv = document.createElement('div');
@@ -74,7 +74,9 @@ function createPattern(initialData = null) {
   }
 
   // 绑定事件
+  console.log(`[创建牌路] patternId=${patternId}, 按钮ID=add-col-custom-${patternId}`);
   document.getElementById(`add-col-custom-${patternId}`).addEventListener('click', () => {
+    console.log(`[点击增加] patternId=${patternId}`);
     addColumnToCustomPattern(patternId);
     savePatterns(); // 自动保存
   });

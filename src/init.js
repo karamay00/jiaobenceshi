@@ -65,7 +65,7 @@ document.getElementById('toggle-panel').addEventListener('click', () => {
 const savedData = loadPatterns();
 if (savedData && savedData.patterns && savedData.patterns.length > 0) {
   // 恢复保存的配置
-  patternIdCounter = savedData.nextId || savedData.patterns.length;
+  window.patternIdCounter = savedData.nextId || savedData.patterns.length;
 
   savedData.patterns.forEach(pattern => {
     if (pattern.type === 'preset') {
