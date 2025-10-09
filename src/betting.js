@@ -191,10 +191,18 @@ function tryActivatePresetGroup(groupId, state) {
 
 // 尝试激活自定义牌路
 function tryActivateCustomPattern(patternId, state) {
-  const inputRow = document.getElementById(`input-row-custom-${patternId.replace('pattern-', '')}`);
-  const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
+  console.log(`[调试] 尝试激活自定义牌路 ${patternId}`);
 
-  if (!inputRow || !selectRow) return;
+  const numericId = patternId.replace('pattern-', '');
+  const inputRow = document.getElementById(`input-row-custom-${numericId}`);
+  const selectRow = document.getElementById(`select-row-custom-${numericId}`);
+
+  console.log(`[调试] numericId=${numericId}, inputRow=${inputRow}, selectRow=${selectRow}`);
+
+  if (!inputRow || !selectRow) {
+    console.log(`[调试] 未找到元素，退出`);
+    return;
+  }
 
   // 找到第一个数字不为0的列
   let entryPoint = -1;
@@ -206,7 +214,11 @@ function tryActivateCustomPattern(patternId, state) {
     }
   }
 
-  if (entryPoint === -1) return;
+  console.log(`[调试] entryPoint=${entryPoint}`);
+  if (entryPoint === -1) {
+    console.log(`[调试] 没有找到入场点，退出`);
+    return;
+  }
 
   // 检查历史匹配
   const requiredHistory = [];
@@ -214,10 +226,18 @@ function tryActivateCustomPattern(patternId, state) {
     requiredHistory.push(selectRow.children[col].value);
   }
 
-  if (window.gameHistory.length < requiredHistory.length) return;
+  console.log(`[调试] requiredHistory=${JSON.stringify(requiredHistory)}, gameHistory长度=${window.gameHistory.length}`);
+
+  if (window.gameHistory.length < requiredHistory.length) {
+    console.log(`[调试] 历史长度不够，需要${requiredHistory.length}条，实际${window.gameHistory.length}条`);
+    return;
+  }
 
   const recentHistory = window.gameHistory.slice(-requiredHistory.length);
+  console.log(`[调试] recentHistory=${JSON.stringify(recentHistory)}`);
+
   const isMatch = requiredHistory.every((val, idx) => val === recentHistory[idx]);
+  console.log(`[调试] 匹配结果=${isMatch}`);
 
   if (isMatch) {
     state.isActivated = true;
@@ -225,6 +245,8 @@ function tryActivateCustomPattern(patternId, state) {
     state.currentPointer = entryPoint;
     console.log(`[激活] 自定义牌路 ${patternId} 激活，指针在第 ${entryPoint} 列`);
     updatePatternUI(patternId, state);
+  } else {
+    console.log(`[调试] 历史不匹配，无法激活`);
   }
 }
 
