@@ -289,7 +289,7 @@ function autoPlaceBets() {
     }
 
     console.log(`[执行下注] ${patternDesc} 下注: ${message}`);
-    // placeBet(message); // 已注释：测试时不实际发送下注请求
+    placeBet(message);
   }
 }
 
