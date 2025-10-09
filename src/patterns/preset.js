@@ -146,6 +146,8 @@ function createPresetPatternGroup(config, initialData = null) {
       <button id="toggle-collapse-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▲</button>
       <span style="font-weight: bold;">${patternPreview}</span>
       <span id="status-collapsed-preset-${groupId}" style="color: #fff;">[未激活]</span>
+      <input type="checkbox" id="enable-collapsed-preset-${groupId}" style="width: 18px; height: 18px; cursor: pointer; margin-left: 8px;">
+      <label for="enable-collapsed-preset-${groupId}" style="cursor: pointer; font-size: 11px;">启用</label>
       <span style="flex: 1; text-align: right;">本组累计盈亏：<span id="profit-collapsed-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     </div>
   `;
@@ -189,6 +191,13 @@ function createPresetPatternGroup(config, initialData = null) {
     document.getElementById(`profit-collapsed-preset-${groupId}`).textContent = profitValue;
     document.getElementById(`profit-collapsed-preset-${groupId}`).style.color = document.getElementById(`profit-preset-${groupId}`).style.color;
 
+    // 同步勾选框状态
+    const expandedCheckbox = document.getElementById(`enable-${groupId}`);
+    const collapsedCheckbox = document.getElementById(`enable-collapsed-preset-${groupId}`);
+    if (expandedCheckbox && collapsedCheckbox) {
+      collapsedCheckbox.checked = expandedCheckbox.checked;
+    }
+
     // 收起
     expanded.style.display = 'none';
     collapsed.style.display = 'block';
@@ -197,6 +206,13 @@ function createPresetPatternGroup(config, initialData = null) {
   document.getElementById(`toggle-collapse-preset-${groupId}`).addEventListener('click', () => {
     const expanded = document.getElementById(`expanded-preset-${groupId}`);
     const collapsed = document.getElementById(`collapsed-preset-${groupId}`);
+
+    // 同步勾选框状态
+    const expandedCheckbox = document.getElementById(`enable-${groupId}`);
+    const collapsedCheckbox = document.getElementById(`enable-collapsed-preset-${groupId}`);
+    if (expandedCheckbox && collapsedCheckbox) {
+      expandedCheckbox.checked = collapsedCheckbox.checked;
+    }
 
     // 展开
     expanded.style.display = 'block';
@@ -214,10 +230,33 @@ function createPresetPatternGroup(config, initialData = null) {
     savePatterns(); // 自动保存
   });
 
+  // 展开状态勾选框事件
   document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
     const isEnabled = e.target.checked;
     console.log(`预设组 ${groupId} ${isEnabled ? '已启用' : '已停用'}`);
     togglePresetGroupInteraction(groupId, isEnabled);
+
+    // 同步到收起状态的勾选框
+    const collapsedCheckbox = document.getElementById(`enable-collapsed-preset-${groupId}`);
+    if (collapsedCheckbox) {
+      collapsedCheckbox.checked = isEnabled;
+    }
+
+    savePatterns(); // 自动保存
+  });
+
+  // 收起状态勾选框事件
+  document.getElementById(`enable-collapsed-preset-${groupId}`).addEventListener('change', (e) => {
+    const isEnabled = e.target.checked;
+    console.log(`预设组 ${groupId} ${isEnabled ? '已启用' : '已停用'}`);
+    togglePresetGroupInteraction(groupId, isEnabled);
+
+    // 同步到展开状态的勾选框
+    const expandedCheckbox = document.getElementById(`enable-${groupId}`);
+    if (expandedCheckbox) {
+      expandedCheckbox.checked = isEnabled;
+    }
+
     savePatterns(); // 自动保存
   });
 
