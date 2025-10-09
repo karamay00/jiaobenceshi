@@ -46,9 +46,15 @@ function createPattern(initialData = null) {
   if (initialData && initialData.columns) {
     const targetColCount = initialData.columns.length;
 
-    // 添加额外的列
+    // 添加额外的列（直接操作 row1 和 row2，不用 getElementById）
     while (row1.children.length < targetColCount) {
-      addColumnToCustomPattern(patternId);
+      const newInput = createAmountInput();
+      newInput.addEventListener('change', () => savePatterns());
+      row1.appendChild(newInput);
+
+      const newSelect = createBetSelect('庄', true);
+      newSelect.addEventListener('change', () => savePatterns());
+      row2.appendChild(newSelect);
     }
 
     // 填充金额和下注类型
@@ -60,6 +66,16 @@ function createPattern(initialData = null) {
         // 同步更新背景颜色
         row2.children[i].style.background = col.betType === '庄' ? 'red' : 'blue';
       }
+    }
+
+    // 如果有多列，启用删除按钮（在元素添加到 DOM 后）
+    if (targetColCount > 1) {
+      setTimeout(() => {
+        const deleteBtn = document.getElementById(`delete-col-custom-${patternId}`);
+        if (deleteBtn) {
+          deleteBtn.disabled = false;
+        }
+      }, 0);
     }
 
     // 设置复选框状态
