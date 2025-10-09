@@ -63,7 +63,11 @@ function createPattern(initialData = null) {
     for (let i = 0; i < initialData.columns.length; i++) {
       const col = initialData.columns[i];
       if (row1.children[i]) row1.children[i].value = col.amount;
-      if (row2.children[i]) row2.children[i].value = col.betType;
+      if (row2.children[i]) {
+        row2.children[i].value = col.betType;
+        // 同步更新背景颜色
+        row2.children[i].style.background = col.betType === '庄' ? 'red' : 'blue';
+      }
     }
 
     // 设置复选框状态
