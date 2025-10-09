@@ -83,5 +83,9 @@ if (savedData && savedData.patterns && savedData.patterns.length > 0) {
   // 创建默认的预设组
   createPresetPatternGroup(PRESET_CONFIGS[0]);
   createPresetPatternGroup(PRESET_CONFIGS[1]);
+  createPresetPatternGroup(PRESET_CONFIGS[2]);
+  createPresetPatternGroup(PRESET_CONFIGS[3]);
+  createPresetPatternGroup(PRESET_CONFIGS[4]);
+  createPresetPatternGroup(PRESET_CONFIGS[5]);
   console.log('[初始化] 已创建默认预设组');
 }

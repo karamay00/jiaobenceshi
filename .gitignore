@@ -2,3 +2,10 @@ node_modules/
 .DS_Store
 *.log
 chrome-user-data/
+
+# 构建生成的文件
+script.js
+bookmarklet.txt
+bookmarklet-raw.txt
+bookmarklet-generated.txt
+install.html
