@@ -5,7 +5,7 @@ const panelHtml = `
   <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; height: 95vh; background: rgba(128, 128, 128, 0.6); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">
       <button id="toggle-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #2196F3; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">▼</button>
-      <h3 id="panel-title" style="margin: 0; flex: 1; text-align: center;">霸天虎面板</h3>
+      <h3 id="panel-title" style="margin: 0; flex: 1; text-align: center; cursor: move; user-select: none;">霸天虎面板</h3>
       <button id="close-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">×</button>
     </div>
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
@@ -158,6 +158,81 @@ function updatePanel() {
 
 // 定时更新面板内容
 setInterval(updatePanel, 5000); // 每5秒更新一次面板
+
+// ========== 面板拖拽功能 ==========
+
+// 拖拽状态
+let isDragging = false;
+let currentX;
+let currentY;
+let initialX;
+let initialY;
+let xOffset = 0;
+let yOffset = 0;
+
+// 获取面板和标题元素
+const panel = document.getElementById('custom-panel');
+const panelTitle = document.getElementById('panel-title');
+
+// 鼠标按下开始拖拽
+panelTitle.addEventListener('mousedown', dragStart);
+
+function dragStart(e) {
+  // 获取当前面板位置
+  const rect = panel.getBoundingClientRect();
+
+  initialX = e.clientX - rect.left;
+  initialY = e.clientY - rect.top;
+
+  if (e.target === panelTitle) {
+    isDragging = true;
+
+    // 添加全局事件监听
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', dragEnd);
+  }
+}
+
+function drag(e) {
+  if (isDragging) {
+    e.preventDefault();
+
+    currentX = e.clientX - initialX;
+    currentY = e.clientY - initialY;
+
+    // 边界检测
+    const panelWidth = panel.offsetWidth;
+    const panelHeight = panel.offsetHeight;
+    const maxX = window.innerWidth - panelWidth;
+    const maxY = window.innerHeight - panelHeight;
+
+    currentX = Math.max(0, Math.min(currentX, maxX));
+    currentY = Math.max(0, Math.min(currentY, maxY));
+
+    xOffset = currentX;
+    yOffset = currentY;
+
+    // 更新面板位置（切换到 left 定位）
+    panel.style.right = 'auto';
+    panel.style.left = currentX + 'px';
+    panel.style.top = currentY + 'px';
+  }
+}
+
+function dragEnd(e) {
+  if (isDragging) {
+    isDragging = false;
+
+    // 移除全局事件监听
+    document.removeEventListener('mousemove', drag);
+    document.removeEventListener('mouseup', dragEnd);
+
+    // 保存位置到 localStorage
+    if (typeof savePanelPosition === 'function') {
+      savePanelPosition(xOffset, yOffset);
+    }
+  }
+}
 
 // ========== 通用 UI 组件 ==========
 

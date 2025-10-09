@@ -90,3 +90,13 @@ if (savedData && savedData.patterns && savedData.patterns.length > 0) {
   createPresetPatternGroup(PRESET_CONFIGS[5]);
   console.log('[初始化] 已创建默认预设组');
 }
+
+// 恢复面板位置
+const savedPosition = loadPanelPosition();
+if (savedPosition) {
+  const panel = document.getElementById('custom-panel');
+  panel.style.right = 'auto';
+  panel.style.left = savedPosition.x + 'px';
+  panel.style.top = savedPosition.y + 'px';
+  console.log('[初始化] 已恢复面板位置 x:', savedPosition.x, 'y:', savedPosition.y);
+}

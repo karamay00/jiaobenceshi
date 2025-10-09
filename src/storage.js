@@ -80,3 +80,28 @@ function loadPatterns() {
     return null;
   }
 }
+
+// 保存面板位置到 localStorage
+function savePanelPosition(x, y) {
+  try {
+    localStorage.setItem('batian_panel_position', JSON.stringify({ x, y }));
+    console.log('[保存位置] x:', x, 'y:', y);
+  } catch (e) {
+    console.error('[保存位置] 失败:', e);
+  }
+}
+
+// 从 localStorage 加载面板位置
+function loadPanelPosition() {
+  try {
+    const saved = localStorage.getItem('batian_panel_position');
+    if (!saved) return null;
+
+    const position = JSON.parse(saved);
+    console.log('[加载位置] x:', position.x, 'y:', position.y);
+    return position;
+  } catch (e) {
+    console.error('[加载位置] 解析失败:', e);
+    return null;
+  }
+}
