@@ -74,7 +74,7 @@ function createPattern(initialData = null) {
   }
 
   // 绑定事件
-  console.log(`[创建牌路] patternId=${patternId}, 按钮ID=add-col-custom-${patternId}`);
+  console.log(`[创建牌路] patternId=${patternId}, initialData?.id=${initialData?.id}, window.patternIdCounter=${window.patternIdCounter}, 按钮ID=add-col-custom-${patternId}`);
   document.getElementById(`add-col-custom-${patternId}`).addEventListener('click', () => {
     console.log(`[点击增加] patternId=${patternId}`);
     addColumnToCustomPattern(patternId);

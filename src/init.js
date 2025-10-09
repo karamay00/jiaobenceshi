@@ -66,6 +66,7 @@ const savedData = loadPatterns();
 if (savedData && savedData.patterns && savedData.patterns.length > 0) {
   // 恢复保存的配置
   window.patternIdCounter = savedData.nextId || savedData.patterns.length;
+  console.log('[初始化] patternIdCounter 设置为:', window.patternIdCounter);
 
   savedData.patterns.forEach(pattern => {
     if (pattern.type === 'preset') {

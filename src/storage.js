@@ -32,9 +32,11 @@ function savePatterns() {
       });
     } else {
       // 自定义牌路
-      const inputRow = document.getElementById(`input-row-custom-${patternId}`);
-      const selectRow = document.getElementById(`select-row-custom-${patternId}`);
-      const checkbox = document.getElementById(`enable-custom-${patternId}`);
+      // 从 patternId (格式: "pattern-123") 中提取数字ID
+      const numericId = parseInt(patternId.replace('pattern-', ''));
+      const inputRow = document.getElementById(`input-row-custom-${numericId}`);
+      const selectRow = document.getElementById(`select-row-custom-${numericId}`);
+      const checkbox = document.getElementById(`enable-custom-${numericId}`);
 
       if (!inputRow || !selectRow) continue;
 
@@ -47,7 +49,7 @@ function savePatterns() {
       }
 
       patterns.push({
-        id: parseInt(patternId),
+        id: numericId,
         type: 'custom',
         columns: columns,
         enabled: checkbox ? checkbox.checked : false
