@@ -2,7 +2,7 @@
 
 // 小面板的 HTML 结构
 const panelHtml = `
-  <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; width: 630px; height: 95vh; background: rgba(128, 128, 128, 0.6); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
+  <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; height: 95vh; background: rgba(128, 128, 128, 0.6); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">
       <button id="toggle-panel" style="width: 25px; height: 25px; background: #2196F3; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex-shrink: 0;">▼</button>
       <h3 id="panel-title" style="margin: 0; flex: 1; text-align: center;">霸天虎面板</h3>
@@ -37,6 +37,24 @@ style.textContent = `
   input[type=number]::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
+  }
+
+  /* 响应式宽度 */
+  #custom-panel {
+    width: 70%; /* 默认大屏幕 */
+    min-width: 320px;
+  }
+
+  @media (max-width: 1199px) {
+    #custom-panel {
+      width: 85%; /* 中等屏幕 */
+    }
+  }
+
+  @media (max-width: 767px) {
+    #custom-panel {
+      width: 95%; /* 小屏幕 */
+    }
   }
 
   /* 收起状态的样式 */
