@@ -154,6 +154,8 @@ function updatePanel() {
   const historySpan = document.getElementById('game-history');
   if (window.gameHistory && window.gameHistory.length > 0) {
     historySpan.textContent = window.gameHistory.join(' ');
+    // 自动滚动到最右边，显示最新记录
+    historySpan.scrollLeft = historySpan.scrollWidth;
   } else {
     historySpan.textContent = '-';
   }
