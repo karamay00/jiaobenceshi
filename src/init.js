@@ -1,7 +1,7 @@
 // ========== 初始化和事件绑定 ==========
 
 // 新增牌路按钮事件
-document.getElementById('add-pattern').addEventListener('click', createPattern);
+document.getElementById('add-pattern').addEventListener('click', () => createPattern());
 
 // 清空牌路按钮事件
 document.getElementById('clear-history').addEventListener('click', () => {
