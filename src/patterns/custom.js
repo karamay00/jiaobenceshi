@@ -73,13 +73,13 @@ function createPattern(initialData = null) {
     }
   }
 
-  // 获取前6个牌型用于预览（带颜色）
+  // 获取前6个牌型用于预览（带颜色和描边）
   const patternPreview = Array.from(row2.children)
     .slice(0, 6)
     .map(select => {
       const val = select.value;
       const color = val === '庄' ? 'red' : 'blue';
-      return `<span style="color: ${color};">${val}</span>`;
+      return `<span style="color: ${color}; -webkit-text-stroke: 0.7px white; text-stroke: 0.7px white;">${val}</span>`;
     })
     .join('');
 
@@ -97,7 +97,7 @@ function createPattern(initialData = null) {
   collapsedContainer.innerHTML = `
     <div style="display: flex; align-items: center; gap: 8px;">
       <button id="toggle-collapse-custom-${patternId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▲</button>
-      <span style="font-weight: bold; -webkit-text-stroke: 1px white; text-stroke: 1px white;">${patternPreview}</span>
+      <span style="font-weight: bold;">${patternPreview}</span>
       <span id="status-collapsed-custom-${patternId}" style="color: #fff;">[未激活]</span>
       <span style="flex: 1; text-align: right;">本牌路累计盈亏：<span id="profit-collapsed-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     </div>
