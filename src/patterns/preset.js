@@ -74,7 +74,7 @@ function createPresetPatternGroup(config, initialData = null) {
 
   // 创建组容器
   const groupDiv = document.createElement('div');
-  groupDiv.id = `preset-group-${groupId}`;
+  groupDiv.id = `group-preset-${groupId}`;
   groupDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 2px; border-radius: 5px;';
 
   // 创建表格容器
@@ -83,14 +83,14 @@ function createPresetPatternGroup(config, initialData = null) {
 
   // 第1行：数字输入框
   const inputRow = document.createElement('div');
-  inputRow.id = `input-row-${groupId}`;
+  inputRow.id = `input-row-preset-${groupId}`;
   inputRow.style.cssText = 'display: flex; gap: 3px;';
 
   // 第2到(rowCount+1)行：下拉菜单
   const selectRows = [];
   for (let i = 0; i < rowCount; i++) {
     const row = document.createElement('div');
-    row.id = `select-row-${groupId}-${i}`;
+    row.id = `select-row-preset-${groupId}-${i}`;
     row.style.cssText = 'display: flex; gap: 3px;';
     selectRows.push(row);
   }
@@ -124,10 +124,10 @@ function createPresetPatternGroup(config, initialData = null) {
   controlBar.innerHTML = `
     <button id="toggle-expand-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▼</button>
     <span style="flex: 1;">本组累计盈亏：<span id="profit-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
-    <button id="add-col-${groupId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
-    <button id="delete-col-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
-    <input type="checkbox" id="enable-${groupId}" style="width: 20px; height: 20px; cursor: pointer;">
-    <label for="enable-${groupId}" style="cursor: pointer;">启用</label>
+    <button id="add-col-preset-${groupId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
+    <button id="delete-col-preset-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
+    <input type="checkbox" id="enable-preset-${groupId}" style="width: 20px; height: 20px; cursor: pointer;">
+    <label for="enable-preset-${groupId}" style="cursor: pointer;">启用</label>
   `;
 
   // 创建展开容器（默认显示）
@@ -171,7 +171,7 @@ function createPresetPatternGroup(config, initialData = null) {
     }
 
     // 设置复选框状态
-    const checkbox = document.getElementById(`enable-${groupId}`);
+    const checkbox = document.getElementById(`enable-preset-${groupId}`);
     if (checkbox) {
       checkbox.checked = initialData.enabled || false;
       // 如果已启用，则禁用交互
@@ -192,7 +192,7 @@ function createPresetPatternGroup(config, initialData = null) {
     document.getElementById(`profit-collapsed-preset-${groupId}`).style.color = document.getElementById(`profit-preset-${groupId}`).style.color;
 
     // 同步勾选框状态
-    const expandedCheckbox = document.getElementById(`enable-${groupId}`);
+    const expandedCheckbox = document.getElementById(`enable-preset-${groupId}`);
     const collapsedCheckbox = document.getElementById(`enable-collapsed-preset-${groupId}`);
     if (expandedCheckbox && collapsedCheckbox) {
       collapsedCheckbox.checked = expandedCheckbox.checked;
@@ -208,7 +208,7 @@ function createPresetPatternGroup(config, initialData = null) {
     const collapsed = document.getElementById(`collapsed-preset-${groupId}`);
 
     // 同步勾选框状态
-    const expandedCheckbox = document.getElementById(`enable-${groupId}`);
+    const expandedCheckbox = document.getElementById(`enable-preset-${groupId}`);
     const collapsedCheckbox = document.getElementById(`enable-collapsed-preset-${groupId}`);
     if (expandedCheckbox && collapsedCheckbox) {
       expandedCheckbox.checked = collapsedCheckbox.checked;
@@ -220,18 +220,18 @@ function createPresetPatternGroup(config, initialData = null) {
   });
 
   // 绑定事件
-  document.getElementById(`add-col-${groupId}`).addEventListener('click', () => {
+  document.getElementById(`add-col-preset-${groupId}`).addEventListener('click', () => {
     addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns);
     savePatterns(); // 自动保存
   });
 
-  document.getElementById(`delete-col-${groupId}`).addEventListener('click', () => {
+  document.getElementById(`delete-col-preset-${groupId}`).addEventListener('click', () => {
     deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCount);
     savePatterns(); // 自动保存
   });
 
   // 展开状态勾选框事件
-  document.getElementById(`enable-${groupId}`).addEventListener('change', (e) => {
+  document.getElementById(`enable-preset-${groupId}`).addEventListener('change', (e) => {
     const isEnabled = e.target.checked;
     console.log(`预设组 ${groupId} ${isEnabled ? '已启用' : '已停用'}`);
     togglePresetGroupInteraction(groupId, isEnabled);
@@ -252,7 +252,7 @@ function createPresetPatternGroup(config, initialData = null) {
     togglePresetGroupInteraction(groupId, isEnabled);
 
     // 同步到展开状态的勾选框
-    const expandedCheckbox = document.getElementById(`enable-${groupId}`);
+    const expandedCheckbox = document.getElementById(`enable-preset-${groupId}`);
     if (expandedCheckbox) {
       expandedCheckbox.checked = isEnabled;
     }
@@ -268,7 +268,7 @@ function createPresetPatternGroup(config, initialData = null) {
 
   // 初始化牌路状态
   const configIndex = PRESET_CONFIGS.findIndex(c => c.name === config.name);
-  window.patternStates[groupId] = {
+  window.patternStates[`preset-${groupId}`] = {
     type: 'preset',
     configIndex: configIndex,
     isActivated: false,
@@ -276,12 +276,12 @@ function createPresetPatternGroup(config, initialData = null) {
     currentPointer: -1,
     rowCount: rowCount
   };
-  updatePatternUI(groupId, window.patternStates[groupId]);
+  updatePatternUI(`preset-${groupId}`, window.patternStates[`preset-${groupId}`]);
 }
 
 // 动态添加列到预设组（一次添加1列）
 function addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns) {
-  const inputRow = document.getElementById(`input-row-${groupId}`);
+  const inputRow = document.getElementById(`input-row-preset-${groupId}`);
 
   // 添加输入框
   const newInput = createAmountInput();
@@ -295,12 +295,12 @@ function addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns
 
   // 为每一行添加下拉菜单（使用计算出的基础模式值，不可编辑）
   for (let row = 0; row < rowCount; row++) {
-    const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
+    const selectRow = document.getElementById(`select-row-preset-${groupId}-${row}`);
     selectRow.appendChild(createBetSelect(patterns[row][patternIndex], false));
   }
 
   // 启用删除按钮
-  const deleteBtn = document.getElementById(`delete-col-${groupId}`);
+  const deleteBtn = document.getElementById(`delete-col-preset-${groupId}`);
   if (deleteBtn) {
     deleteBtn.disabled = false;
   }
@@ -308,7 +308,7 @@ function addColumnToPresetGroup(groupId, rowCount, basePatternColCount, patterns
 
 // 删除预设组的最后1列
 function deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCount) {
-  const inputRow = document.getElementById(`input-row-${groupId}`);
+  const inputRow = document.getElementById(`input-row-preset-${groupId}`);
 
   // 检查是否有可删除的列
   if (inputRow.children.length <= initialColCount) {
@@ -322,7 +322,7 @@ function deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCoun
 
   // 删除每行下拉菜单的最后一个
   for (let row = 0; row < rowCount; row++) {
-    const selectRow = document.getElementById(`select-row-${groupId}-${row}`);
+    const selectRow = document.getElementById(`select-row-preset-${groupId}-${row}`);
     if (selectRow && selectRow.lastChild) {
       selectRow.removeChild(selectRow.lastChild);
     }
@@ -330,7 +330,7 @@ function deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCoun
 
   // 如果删除后只剩初始列数，禁用删除按钮
   if (inputRow.children.length <= initialColCount) {
-    const deleteBtn = document.getElementById(`delete-col-${groupId}`);
+    const deleteBtn = document.getElementById(`delete-col-preset-${groupId}`);
     if (deleteBtn) {
       deleteBtn.disabled = true;
     }
@@ -340,7 +340,7 @@ function deleteLastColumn(groupId, rowCount, initialColCount, basePatternColCoun
 // 锁定/解锁预设组的交互
 function togglePresetGroupInteraction(groupId, isDisabled) {
   // 禁用/启用所有输入框
-  const inputRow = document.getElementById(`input-row-${groupId}`);
+  const inputRow = document.getElementById(`input-row-preset-${groupId}`);
   if (inputRow) {
     Array.from(inputRow.children).forEach(input => {
       input.disabled = isDisabled;
@@ -348,8 +348,8 @@ function togglePresetGroupInteraction(groupId, isDisabled) {
   }
 
   // 禁用/启用增加和删除按钮
-  const addBtn = document.getElementById(`add-col-${groupId}`);
-  const deleteBtn = document.getElementById(`delete-col-${groupId}`);
+  const addBtn = document.getElementById(`add-col-preset-${groupId}`);
+  const deleteBtn = document.getElementById(`delete-col-preset-${groupId}`);
   if (addBtn) addBtn.disabled = isDisabled;
   if (deleteBtn && inputRow && inputRow.children.length > 1) {
     deleteBtn.disabled = isDisabled;

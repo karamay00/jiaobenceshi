@@ -11,20 +11,22 @@ function savePatterns() {
   for (let patternId in window.patternStates) {
     const state = window.patternStates[patternId];
 
+    // 从 patternId (格式: "preset-0" 或 "custom-0") 中提取数字ID
+    const numericId = parseInt(patternId.split('-')[1]);
+    const inputRow = document.getElementById(`input-row-${patternId}`);
+    const checkbox = document.getElementById(`enable-${patternId}`);
+
+    if (!inputRow) continue;
+
     if (state.type === 'preset') {
       // 预设组
-      const inputRow = document.getElementById(`input-row-${patternId}`);
-      const checkbox = document.getElementById(`enable-${patternId}`);
-
-      if (!inputRow) continue;
-
       const amounts = [];
       for (let i = 0; i < inputRow.children.length; i++) {
         amounts.push(parseInt(inputRow.children[i].value) || 0);
       }
 
       patterns.push({
-        id: parseInt(patternId),
+        id: numericId,
         type: 'preset',
         configIndex: state.configIndex || 0,
         amounts: amounts,
@@ -32,13 +34,9 @@ function savePatterns() {
       });
     } else {
       // 自定义牌路
-      // 从 patternId (格式: "pattern-123") 中提取数字ID
-      const numericId = parseInt(patternId.replace('pattern-', ''));
-      const inputRow = document.getElementById(`input-row-custom-${numericId}`);
-      const selectRow = document.getElementById(`select-row-custom-${numericId}`);
-      const checkbox = document.getElementById(`enable-custom-${numericId}`);
+      const selectRow = document.getElementById(`select-row-${patternId}`);
 
-      if (!inputRow || !selectRow) continue;
+      if (!selectRow) continue;
 
       const columns = [];
       for (let i = 0; i < inputRow.children.length; i++) {

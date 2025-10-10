@@ -7,7 +7,7 @@ function createPattern(initialData = null) {
   const container = document.getElementById('pattern-container');
 
   const patternDiv = document.createElement('div');
-  patternDiv.id = `pattern-${patternId}`;
+  patternDiv.id = `pattern-custom-${patternId}`;
   patternDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 2px; border-radius: 5px;';
 
   // 创建表格容器
@@ -34,12 +34,12 @@ function createPattern(initialData = null) {
   controlBar.style.cssText = 'margin-top: 10px; display: flex; align-items: center; gap: 10px; color: white; font-size: 12px;';
   controlBar.innerHTML = `
     <button id="toggle-expand-custom-${patternId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▼</button>
-    <span style="flex: 1;">本牌路累计盈亏：<span id="profit-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
+    <span style="flex: 1;">本牌路累计盈亏：<span id="profit-custom-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     <button id="add-col-custom-${patternId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
     <button id="delete-col-custom-${patternId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
     <input type="checkbox" id="enable-custom-${patternId}" style="width: 20px; height: 20px; cursor: pointer;">
     <label for="enable-custom-${patternId}" style="cursor: pointer;">启用</label>
-    <button id="delete-pattern-${patternId}" style="margin-left: auto; padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">×删除牌路</button>
+    <button id="delete-pattern-custom-${patternId}" style="margin-left: auto; padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">×删除牌路</button>
   `;
 
   // 如果有初始数据，添加额外的列并填充值
@@ -117,7 +117,7 @@ function createPattern(initialData = null) {
       <span id="status-collapsed-custom-${patternId}" style="color: #fff;">[未激活]</span>
       <input type="checkbox" id="enable-collapsed-custom-${patternId}" style="width: 18px; height: 18px; cursor: pointer; margin-left: 8px;">
       <label for="enable-collapsed-custom-${patternId}" style="cursor: pointer; font-size: 11px;">启用</label>
-      <span style="flex: 1; text-align: right;">本牌路累计盈亏：<span id="profit-collapsed-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
+      <span style="flex: 1; text-align: right;">本牌路累计盈亏：<span id="profit-collapsed-custom-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     </div>
   `;
 
@@ -131,9 +131,9 @@ function createPattern(initialData = null) {
     const collapsed = document.getElementById(`collapsed-custom-${patternId}`);
 
     // 同步盈亏数据
-    const profitValue = document.getElementById(`profit-${patternId}`).textContent;
-    document.getElementById(`profit-collapsed-${patternId}`).textContent = profitValue;
-    document.getElementById(`profit-collapsed-${patternId}`).style.color = document.getElementById(`profit-${patternId}`).style.color;
+    const profitValue = document.getElementById(`profit-custom-${patternId}`).textContent;
+    document.getElementById(`profit-collapsed-custom-${patternId}`).textContent = profitValue;
+    document.getElementById(`profit-collapsed-custom-${patternId}`).style.color = document.getElementById(`profit-custom-${patternId}`).style.color;
 
     // 同步勾选框状态
     const expandedCheckbox = document.getElementById(`enable-custom-${patternId}`);
@@ -206,9 +206,9 @@ function createPattern(initialData = null) {
     savePatterns(); // 自动保存
   });
 
-  document.getElementById(`delete-pattern-${patternId}`).addEventListener('click', () => {
+  document.getElementById(`delete-pattern-custom-${patternId}`).addEventListener('click', () => {
     patternDiv.remove();
-    delete window.patternStates[`pattern-${patternId}`];
+    delete window.patternStates[`custom-${patternId}`];
     savePatterns(); // 自动保存
   });
 
@@ -223,14 +223,14 @@ function createPattern(initialData = null) {
   });
 
   // 初始化牌路状态
-  window.patternStates[`pattern-${patternId}`] = {
+  window.patternStates[`custom-${patternId}`] = {
     type: 'custom',
     isActivated: false,
     activeRowIndex: -1,
     currentPointer: -1,
     rowCount: 1
   };
-  updatePatternUI(`pattern-${patternId}`, window.patternStates[`pattern-${patternId}`]);
+  updatePatternUI(`custom-${patternId}`, window.patternStates[`custom-${patternId}`]);
 }
 
 // 为自定义牌路添加一列

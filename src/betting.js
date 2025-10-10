@@ -19,13 +19,8 @@ function placeBet(message) {
 
 // 动态获取牌路的总列数
 function getTotalColumns(patternId, state) {
-  if (state.type === 'preset') {
-    const inputRow = document.getElementById(`input-row-${patternId}`);
-    return inputRow ? inputRow.children.length : 0;
-  } else {
-    const inputRow = document.getElementById(`input-row-custom-${patternId.replace('pattern-', '')}`);
-    return inputRow ? inputRow.children.length : 0;
-  }
+  const inputRow = document.getElementById(`input-row-${patternId}`);
+  return inputRow ? inputRow.children.length : 0;
 }
 
 // 更新游戏历史
@@ -39,37 +34,20 @@ function updateGameHistory(result) {
 function updatePatternUI(patternId, state) {
   let statusElement, collapsedStatusElement;
 
-  if (state.type === 'preset') {
-    // 预设组：在累计盈亏后面添加状态显示（展开容器）
-    const profitSpan = document.getElementById(`profit-preset-${patternId}`);
-    if (!profitSpan) return;
+  // 统一处理：在累计盈亏后面添加状态显示（展开容器）
+  const profitSpan = document.getElementById(`profit-${patternId}`);
+  if (!profitSpan) return;
 
-    statusElement = profitSpan.parentElement.querySelector('.activation-status');
-    if (!statusElement) {
-      statusElement = document.createElement('span');
-      statusElement.className = 'activation-status';
-      statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
-      profitSpan.parentElement.appendChild(statusElement);
-    }
-
-    // 概览容器中的状态显示
-    collapsedStatusElement = document.getElementById(`status-collapsed-preset-${patternId}`);
-  } else {
-    // 自定义牌路：在盈亏信息后面添加状态显示（展开容器）
-    const profitSpan = document.getElementById(`profit-${patternId.replace('pattern-', '')}`);
-    if (!profitSpan) return;
-
-    statusElement = profitSpan.parentElement.querySelector('.activation-status');
-    if (!statusElement) {
-      statusElement = document.createElement('span');
-      statusElement.className = 'activation-status';
-      statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
-      profitSpan.parentElement.appendChild(statusElement);
-    }
-
-    // 概览容器中的状态显示
-    collapsedStatusElement = document.getElementById(`status-collapsed-custom-${patternId.replace('pattern-', '')}`);
+  statusElement = profitSpan.parentElement.querySelector('.activation-status');
+  if (!statusElement) {
+    statusElement = document.createElement('span');
+    statusElement.className = 'activation-status';
+    statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
+    profitSpan.parentElement.appendChild(statusElement);
   }
+
+  // 概览容器中的状态显示
+  collapsedStatusElement = document.getElementById(`status-collapsed-${patternId}`);
 
   // 更新显示内容（展开容器和概览容器）
   if (state.isActivated) {
@@ -119,7 +97,7 @@ function updatePatternUI(patternId, state) {
     }
   } else {
     // 自定义牌路：清除所有高亮
-    const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
+    const selectRow = document.getElementById(`select-row-${patternId}`);
     if (selectRow) {
       Array.from(selectRow.children).forEach(select => {
         select.style.border = '1px solid #ccc';
@@ -193,11 +171,10 @@ function tryActivatePresetGroup(groupId, state) {
 function tryActivateCustomPattern(patternId, state) {
   console.log(`[调试] 尝试激活自定义牌路 ${patternId}`);
 
-  const numericId = patternId.replace('pattern-', '');
-  const inputRow = document.getElementById(`input-row-custom-${numericId}`);
-  const selectRow = document.getElementById(`select-row-custom-${numericId}`);
+  const inputRow = document.getElementById(`input-row-${patternId}`);
+  const selectRow = document.getElementById(`select-row-${patternId}`);
 
-  console.log(`[调试] numericId=${numericId}, inputRow=${inputRow}, selectRow=${selectRow}`);
+  console.log(`[调试] inputRow=${inputRow}, selectRow=${selectRow}`);
 
   if (!inputRow || !selectRow) {
     console.log(`[调试] 未找到元素，退出`);
@@ -259,9 +236,7 @@ function checkActivation() {
     if (state.isActivated) continue;
 
     // 检查是否勾选
-    const checkbox = state.type === 'preset'
-      ? document.getElementById(`enable-${patternId}`)
-      : document.getElementById(`enable-custom-${patternId.replace('pattern-', '')}`);
+    const checkbox = document.getElementById(`enable-${patternId}`);
     if (!checkbox || !checkbox.checked) continue;
 
     // 尝试激活
@@ -284,9 +259,7 @@ function autoPlaceBets() {
     if (!state.isActivated) continue;
 
     // 必须勾选
-    const checkbox = state.type === 'preset'
-      ? document.getElementById(`enable-${patternId}`)
-      : document.getElementById(`enable-custom-${patternId.replace('pattern-', '')}`);
+    const checkbox = document.getElementById(`enable-${patternId}`);
     if (!checkbox || !checkbox.checked) continue;
 
     // 获取当前列的金额和下注类型
@@ -301,8 +274,8 @@ function autoPlaceBets() {
       amount = parseInt(inputRow.children[state.currentPointer].value) || 0;
       betType = selectRow.children[state.currentPointer].value;
     } else {
-      const inputRow = document.getElementById(`input-row-custom-${patternId.replace('pattern-', '')}`);
-      const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
+      const inputRow = document.getElementById(`input-row-${patternId}`);
+      const selectRow = document.getElementById(`select-row-${patternId}`);
 
       if (!inputRow || !selectRow || state.currentPointer >= inputRow.children.length) continue;
 
@@ -324,10 +297,11 @@ function autoPlaceBets() {
     // 生成牌路描述
     let patternDesc;
     if (state.type === 'preset') {
-      patternDesc = `预设组${parseInt(patternId) + 1}-行${state.activeRowIndex + 1}-第${state.currentPointer}列`;
+      const numericId = patternId.split('-')[1];
+      patternDesc = `预设组${parseInt(numericId) + 1}-行${state.activeRowIndex + 1}-第${state.currentPointer}列`;
     } else {
-      const customId = patternId.replace('pattern-', '');
-      patternDesc = `自定义牌路${customId}-第${state.currentPointer}列`;
+      const numericId = patternId.split('-')[1];
+      patternDesc = `自定义牌路${numericId}-第${state.currentPointer}列`;
     }
 
     console.log(`[执行下注] ${patternDesc} 下注: ${message}`);
@@ -359,7 +333,7 @@ function advancePointers(result) {
 
       expectedBetType = selectRow.children[state.currentPointer].value;
     } else {
-      const selectRow = document.getElementById(`select-row-custom-${patternId.replace('pattern-', '')}`);
+      const selectRow = document.getElementById(`select-row-${patternId}`);
       if (!selectRow || state.currentPointer >= selectRow.children.length) continue;
 
       expectedBetType = selectRow.children[state.currentPointer].value;
