@@ -36,7 +36,7 @@ function createPattern(initialData = null) {
     <button id="toggle-expand-custom-${patternId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▼</button>
     <span style="flex: 1;">本牌路累计盈亏：<span id="profit-custom-${patternId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     <button id="add-col-custom-${patternId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
-    <button id="delete-col-custom-${patternId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
+    <button id="delete-col-custom-${patternId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;" disabled>减</button>
     <input type="checkbox" id="enable-custom-${patternId}" style="width: 20px; height: 20px; cursor: pointer;">
     <label for="enable-custom-${patternId}" style="cursor: pointer;">启用</label>
     <button id="delete-pattern-custom-${patternId}" style="margin-left: auto; padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold;">×删除牌路</button>
@@ -77,16 +77,6 @@ function createPattern(initialData = null) {
         }
       }, 0);
     }
-
-    // 设置复选框状态
-    const checkbox = document.getElementById(`enable-custom-${patternId}`);
-    if (checkbox) {
-      checkbox.checked = initialData.enabled || false;
-      // 如果已启用，则禁用交互
-      if (initialData.enabled) {
-        toggleCustomPatternInteraction(patternId, true);
-      }
-    }
   }
 
   // 获取前6个牌型用于预览（带颜色和描边）
@@ -124,6 +114,22 @@ function createPattern(initialData = null) {
   patternDiv.appendChild(expandedContainer);
   patternDiv.appendChild(collapsedContainer);
   container.appendChild(patternDiv);
+
+  // 如果有初始数据，设置复选框状态（在元素添加到 DOM 后）
+  if (initialData && initialData.enabled !== undefined) {
+    const checkbox = document.getElementById(`enable-custom-${patternId}`);
+    const collapsedCheckbox = document.getElementById(`enable-collapsed-custom-${patternId}`);
+    if (checkbox) {
+      checkbox.checked = initialData.enabled || false;
+    }
+    if (collapsedCheckbox) {
+      collapsedCheckbox.checked = initialData.enabled || false;
+    }
+    // 如果已启用，则禁用交互
+    if (initialData.enabled) {
+      toggleCustomPatternInteraction(patternId, true);
+    }
+  }
 
   // 绑定折叠按钮事件
   document.getElementById(`toggle-expand-custom-${patternId}`).addEventListener('click', () => {

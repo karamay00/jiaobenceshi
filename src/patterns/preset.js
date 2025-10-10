@@ -125,7 +125,7 @@ function createPresetPatternGroup(config, initialData = null) {
     <button id="toggle-expand-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▼</button>
     <span style="flex: 1;">本组累计盈亏：<span id="profit-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
     <button id="add-col-preset-${groupId}" style="padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer;">增</button>
-    <button id="delete-col-preset-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 14px;" disabled>减</button>
+    <button id="delete-col-preset-${groupId}" style="padding: 5px 10px; background: #f44336; color: white; border: none; border-radius: 3px; cursor: pointer;" disabled>减</button>
     <input type="checkbox" id="enable-preset-${groupId}" style="width: 20px; height: 20px; cursor: pointer;">
     <label for="enable-preset-${groupId}" style="cursor: pointer;">启用</label>
   `;

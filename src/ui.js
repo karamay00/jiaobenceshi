@@ -20,12 +20,12 @@ const panelHtml = `
         <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
         <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
           <span style="flex-shrink: 0;">💰 <strong>输赢：</strong></span>
-          <span id="win-lose-history" style="flex: 1; overflow-x: auto; white-space: nowrap;">-</span>
+          <span id="win-lose-history" style="flex: 1; overflow-x: auto; white-space: nowrap; border: 1px solid black; padding: 2px 5px; border-radius: 3px;">-</span>
           <span id="total-score-display" style="flex-shrink: 0; width: 75px; text-align: right; font-weight: bold; border: 2px solid white; padding: 2px 5px; border-radius: 3px;">-</span>
         </div>
         <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
           <span style="flex-shrink: 0;">📜 <strong>历史：</strong></span>
-          <span id="game-history" style="flex: 1; overflow-x: auto; white-space: nowrap;">-</span>
+          <span id="game-history" style="flex: 1; overflow-x: auto; white-space: nowrap; border: 1px solid black; padding: 2px 5px; border-radius: 3px;">-</span>
         </div>
       </div>
       <div style="display: flex; gap: 5px; margin-bottom: 10px;">
@@ -148,12 +148,19 @@ function updatePanel() {
   // 更新输赢历史
   const winLoseHistorySpan = document.getElementById('win-lose-history');
   if (window.winLoseHistory && window.winLoseHistory.length > 0) {
-    // 格式化输赢历史：正数加+，负数不变，0显示0
+    // 格式化输赢历史：正数加+显示绿色，负数显示红色，0显示白色
     const formattedHistory = window.winLoseHistory.map(val => {
-      if (val > 0) return `+${val}`;
-      return val.toString();
+      let color = 'white';
+      let text = val.toString();
+      if (val > 0) {
+        color = '#4CAF50';
+        text = `+${val}`;
+      } else if (val < 0) {
+        color = '#f44336';
+      }
+      return `<span style="color: ${color};">${text}</span>`;
     }).join(' ');
-    winLoseHistorySpan.textContent = formattedHistory;
+    winLoseHistorySpan.innerHTML = formattedHistory;
     // 自动滚动到最右边，显示最新记录
     winLoseHistorySpan.scrollLeft = winLoseHistorySpan.scrollWidth;
 
@@ -168,7 +175,12 @@ function updatePanel() {
   // 更新历史牌路
   const historySpan = document.getElementById('game-history');
   if (window.gameHistory && window.gameHistory.length > 0) {
-    historySpan.textContent = window.gameHistory.join(' ');
+    // 格式化历史牌路：庄显示红色，閒显示蓝色
+    const formattedHistory = window.gameHistory.map(val => {
+      const color = val === '庄' ? 'red' : 'blue';
+      return `<span style="color: ${color};">${val}</span>`;
+    }).join(' ');
+    historySpan.innerHTML = formattedHistory;
     // 自动滚动到最右边，显示最新记录
     historySpan.scrollLeft = historySpan.scrollWidth;
   } else {
