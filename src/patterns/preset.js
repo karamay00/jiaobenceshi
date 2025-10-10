@@ -274,7 +274,8 @@ function createPresetPatternGroup(config, initialData = null) {
     isActivated: false,
     activeRowIndex: -1,
     currentPointer: -1,
-    rowCount: rowCount
+    rowCount: rowCount,
+    totalProfit: 0  // 累计盈亏
   };
   updatePatternUI(`preset-${groupId}`, window.patternStates[`preset-${groupId}`]);
 }

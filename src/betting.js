@@ -1,7 +1,7 @@
 // ========== 自动下注核心功能 ==========
 
 // 下注功能
-function placeBet(message) {
+function placeBet(message, patternId) {
   fetch('http://zzxxyy.shop/doXiazhu.html', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -13,8 +13,21 @@ function placeBet(message) {
   .then(d => {
     if (d.msg === null) d.msg = [];
     console.log('[下注结果]', d);
+
+    // 根据返回的code更新下注成功状态
+    if (window.currentBets && window.currentBets.bets[patternId]) {
+      window.currentBets.bets[patternId].betSuccess = (d.code === 0);
+      console.log(`[下注状态更新] ${patternId} betSuccess=${d.code === 0}, code=${d.code}`);
+    }
   })
-  .catch(error => console.error('下注请求出错:', error));
+  .catch(error => {
+    console.error('下注请求出错:', error);
+    // 出错也更新为失败
+    if (window.currentBets && window.currentBets.bets[patternId]) {
+      window.currentBets.bets[patternId].betSuccess = false;
+      console.log(`[下注状态更新] ${patternId} betSuccess=false (网络错误)`);
+    }
+  });
 }
 
 // 动态获取牌路的总列数
@@ -252,6 +265,13 @@ function checkActivation() {
 function autoPlaceBets() {
   console.log('[自动下注] 开始检查所有牌路...');
 
+  // 初始化本期下注记录
+  window.currentBets = {
+    period: null,
+    openResult: null,
+    bets: {}
+  };
+
   for (let patternId in window.patternStates) {
     const state = window.patternStates[patternId];
 
@@ -283,11 +303,20 @@ function autoPlaceBets() {
       betType = selectRow.children[state.currentPointer].value;
     }
 
-    // 金额为0，跳过
+    // 金额为0，记录为未下注
     if (amount === 0) {
+      window.currentBets.bets[patternId] = { betPlaced: false };
       console.log(`[跳过下注] ${patternId} 第 ${state.currentPointer} 列金额为0`);
       continue;
     }
+
+    // 记录下注信息（注意：用繁体"閒"）
+    window.currentBets.bets[patternId] = {
+      betPlaced: true,
+      betType: betType,        // "庄"或"閒"
+      betAmount: amount,
+      betSuccess: false        // 默认false，等响应
+    };
 
     // 执行下注
     // 将"閒"转换为"闲"用于服务器下注，庄保持不变
@@ -305,8 +334,10 @@ function autoPlaceBets() {
     }
 
     console.log(`[执行下注] ${patternDesc} 下注: ${message}`);
-    placeBet(message);
+    placeBet(message, patternId);  // 传入patternId
   }
+
+  console.log('[下注记录] 已生成', window.currentBets);
 }
 
 // 推进指针逻辑
@@ -364,5 +395,76 @@ function advancePointers(result) {
       state.currentPointer = -1;
       updatePatternUI(patternId, state);
     }
+  }
+}
+
+// 计算输赢并更新累计盈亏
+function calculateProfits() {
+  if (!window.currentBets || !window.currentBets.openResult) {
+    console.log('[计算输赢] 没有有效的下注记录');
+    return;
+  }
+
+  const openResult = window.currentBets.openResult;  // "庄"或"閒"
+  console.log(`[计算输赢] 开奖结果: ${openResult}`);
+
+  for (let patternId in window.currentBets.bets) {
+    const bet = window.currentBets.bets[patternId];
+
+    // 跳过未下注或下注失败的
+    if (!bet.betPlaced || !bet.betSuccess) {
+      console.log(`[计算输赢] ${patternId} 跳过（未下注或失败）`);
+      continue;
+    }
+
+    // 计算盈亏
+    let profit = 0;
+    if (bet.betType === openResult) {
+      profit = bet.betAmount;  // 赢
+      console.log(`[计算输赢] ${patternId} 赢 +${profit}`);
+    } else {
+      profit = -bet.betAmount;  // 输
+      console.log(`[计算输赢] ${patternId} 输 ${profit}`);
+    }
+
+    // 更新累计盈亏
+    if (window.patternStates[patternId]) {
+      if (!window.patternStates[patternId].totalProfit) {
+        window.patternStates[patternId].totalProfit = 0;
+      }
+      window.patternStates[patternId].totalProfit += profit;
+
+      // 更新UI显示
+      updateProfitUI(patternId);
+    }
+  }
+}
+
+// 更新盈亏UI显示
+function updateProfitUI(patternId) {
+  const state = window.patternStates[patternId];
+  if (!state) return;
+
+  const totalProfit = state.totalProfit || 0;
+
+  // 更新展开状态的盈亏显示
+  const profitSpan = document.getElementById(`profit-${patternId}`);
+  if (profitSpan) {
+    profitSpan.textContent = totalProfit;
+    // 设置颜色
+    if (totalProfit > 0) {
+      profitSpan.style.color = '#4CAF50';  // 绿色
+    } else if (totalProfit < 0) {
+      profitSpan.style.color = '#f44336';  // 红色
+    } else {
+      profitSpan.style.color = '#4CAF50';  // 默认绿色
+    }
+  }
+
+  // 更新收起状态的盈亏显示
+  const collapsedProfitSpan = document.getElementById(`profit-collapsed-${patternId}`);
+  if (collapsedProfitSpan) {
+    collapsedProfitSpan.textContent = totalProfit;
+    collapsedProfitSpan.style.color = profitSpan ? profitSpan.style.color : '#4CAF50';
   }
 }

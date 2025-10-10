@@ -228,7 +228,8 @@ function createPattern(initialData = null) {
     isActivated: false,
     activeRowIndex: -1,
     currentPointer: -1,
-    rowCount: 1
+    rowCount: 1,
+    totalProfit: 0  // 累计盈亏
   };
   updatePatternUI(`custom-${patternId}`, window.patternStates[`custom-${patternId}`]);
 }

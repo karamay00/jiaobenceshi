@@ -90,6 +90,23 @@ function parseDataAndDisplay(logData) {
     // 立即更新面板
     updatePanel();
 
+    // 处理下注记录：补充期号和开奖结果，计算输赢
+    if (window.currentBets && window.bthStatus.period && window.bthStatus.result) {
+      window.currentBets.period = `第${window.bthStatus.period}期`;
+      window.currentBets.openResult = window.bthStatus.result;
+
+      console.log('[开奖] 补充下注记录', window.currentBets);
+
+      // 立即计算本期输赢
+      calculateProfits();
+
+      // 保存为上一期记录（可选，用于历史查询）
+      window.lastPeriodBets = JSON.parse(JSON.stringify(window.currentBets));
+
+      // 清空当前记录，准备下一期
+      window.currentBets = null;
+    }
+
     // 自动下注功能：更新历史、检查激活、推进指针
     updateGameHistory(window.bthStatus.result);
     checkActivation();
