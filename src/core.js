@@ -48,6 +48,7 @@ oldLog('%c已开启 console.log 对象捕获，数据保存在 window.logs', 'co
 
 // 初始化全局状态
 window.gameHistory = [];      // 存储开奖历史
+window.winLoseHistory = [];   // 存储每期输赢记录
 window.patternStates = {};    // 管理所有牌路的激活状态
 window.currentBets = null;    // 当前期的下注记录
 window.lastPeriodBets = null; // 上一期的下注记录（含输赢结果）

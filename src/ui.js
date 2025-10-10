@@ -14,12 +14,15 @@ const panelHtml = `
     </div>
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
       <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
-        <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
         <div>📊 <strong>结果：</strong><span id="period">-</span><span id="game-result">-</span></div>
-        <div>💰 <strong>状态：</strong><span id="status">-</span></div>
-        <div>📈 <strong>本期：</strong><span id="win-lose">-</span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
-        <div>🕐 <strong>更新：</strong><span id="update-time">-</span></div>
+        <div>💰 <strong>状态：</strong><span id="status">-</span></div>
+        <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
+        <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
+          <span style="flex-shrink: 0;">💰 <strong>输赢：</strong></span>
+          <span id="win-lose-history" style="flex: 1; overflow-x: auto; white-space: nowrap;">-</span>
+          <span id="total-score-display" style="flex-shrink: 0; width: 75px; text-align: right; font-weight: bold; border: 2px solid white; padding: 2px 5px; border-radius: 3px;">-</span>
+        </div>
         <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
           <span style="flex-shrink: 0;">📜 <strong>历史：</strong></span>
           <span id="game-history" style="flex: 1; overflow-x: auto; white-space: nowrap;">-</span>
@@ -140,20 +143,27 @@ function updatePanel() {
     statusSpan.style.fontWeight = 'normal';
   }
 
-  const winLoseSpan = document.getElementById('win-lose');
-  if (bth.winLose > 0) {
-    winLoseSpan.textContent = `+${bth.winLose}`;
-    winLoseSpan.style.color = '#4CAF50';
-  } else if (bth.winLose < 0) {
-    winLoseSpan.textContent = bth.winLose;
-    winLoseSpan.style.color = '#f44336';
-  } else {
-    winLoseSpan.textContent = bth.winLose || '-';
-    winLoseSpan.style.color = '#fff';
-  }
-
   document.getElementById('total-score').textContent = bth.totalScore || '-';
-  document.getElementById('update-time').textContent = bth.time || '-';
+
+  // 更新输赢历史
+  const winLoseHistorySpan = document.getElementById('win-lose-history');
+  if (window.winLoseHistory && window.winLoseHistory.length > 0) {
+    // 格式化输赢历史：正数加+，负数不变，0显示0
+    const formattedHistory = window.winLoseHistory.map(val => {
+      if (val > 0) return `+${val}`;
+      return val.toString();
+    }).join(' ');
+    winLoseHistorySpan.textContent = formattedHistory;
+    // 自动滚动到最右边，显示最新记录
+    winLoseHistorySpan.scrollLeft = winLoseHistorySpan.scrollWidth;
+
+    // 计算输赢历史的总和并显示
+    const winLoseSum = window.winLoseHistory.reduce((sum, val) => sum + val, 0);
+    document.getElementById('total-score-display').textContent = winLoseSum;
+  } else {
+    winLoseHistorySpan.textContent = '-';
+    document.getElementById('total-score-display').textContent = '-';
+  }
 
   // 更新历史牌路
   const historySpan = document.getElementById('game-history');
