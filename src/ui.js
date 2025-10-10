@@ -12,19 +12,26 @@ const panelHtml = `
       <h3 id="panel-title" style="margin: 0; flex: 1; text-align: center; cursor: move; user-select: none;">霸天虎面板</h3>
       <button id="close-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">×</button>
     </div>
-    <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 150px 150px 1fr; gap: 5px;">
-        <div>📊 <strong>结果：</strong><span id="period">-</span><span id="game-result">-</span></div>
+    <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0;">
+      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 150px 150px auto auto 1fr; gap: 5px;">
+        <div>📊 <strong>结果：</strong><span id="period">-</span><span id="game-result"></span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
         <div style="grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding-left: 10px;">
           <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: white; font-size: 13px; font-weight: bold;">
-            <input type="radio" name="betting-mode" value="auto" checked style="cursor: pointer; width: 16px; height: 16px;">
+            <input type="radio" name="betting-mode" value="auto" style="cursor: pointer; width: 16px; height: 16px;">
             自动
           </label>
           <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: white; font-size: 13px; font-weight: bold;">
-            <input type="radio" name="betting-mode" value="manual" style="cursor: pointer; width: 16px; height: 16px;">
+            <input type="radio" name="betting-mode" value="manual" checked style="cursor: pointer; width: 16px; height: 16px;">
             手动
           </label>
+        </div>
+        <div style="grid-column: 4; grid-row: 1 / 3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding-left: 10px;">
+          <select id="manual-bet-select" style="padding: 5px 10px; background: red; color: white; border: 1px solid #1976D2; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">
+            <option value="庄">庄</option>
+            <option value="閒">閒</option>
+          </select>
+          <button id="manual-bet-confirm" style="padding: 5px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">开奖</button>
         </div>
         <div style="grid-column: 1;">💰 <strong>状态：</strong><span id="status">-</span></div>
         <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
@@ -42,7 +49,7 @@ const panelHtml = `
         <button id="add-pattern" style="flex: 1; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
         <button id="clear-history" style="flex: 1; padding: 8px; background: #FF9800; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">清空牌路</button>
       </div>
-      <div id="pattern-container" style="flex: 1; overflow-y: scroll; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px;"></div>
+      <div id="pattern-container" style="flex: 1; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px; min-height: 0;"></div>
     </div>
   </div>
 `;

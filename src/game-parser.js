@@ -114,5 +114,6 @@ function parseDataAndDisplay(logData) {
     updateGameHistory(window.bthStatus.result);
     checkActivation();
     advancePointers(window.bthStatus.result);
+    updatePanel(); // 更新UI显示最新历史
   }
 }
