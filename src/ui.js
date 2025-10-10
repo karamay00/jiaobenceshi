@@ -5,6 +5,10 @@ const panelHtml = `
   <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; height: 95vh; background: rgba(128, 128, 128, 0.6); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">
       <button id="toggle-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #2196F3; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">▼</button>
+      <select id="betting-strategy" style="height: 25px; padding: 0 5px; margin-left: 8px; background: #2196F3; color: white; border: 1px solid #1976D2; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; flex: none;">
+        <option value="sequential">顺序下注</option>
+        <option value="both-bet-big">庄闲同时出现下大</option>
+      </select>
       <h3 id="panel-title" style="margin: 0; flex: 1; text-align: center; cursor: move; user-select: none;">霸天虎面板</h3>
       <button id="close-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">×</button>
     </div>
@@ -72,7 +76,8 @@ style.textContent = `
 
   #custom-panel.collapsed #panel-content,
   #custom-panel.collapsed #panel-title,
-  #custom-panel.collapsed #close-panel {
+  #custom-panel.collapsed #close-panel,
+  #custom-panel.collapsed #betting-strategy {
     display: none !important;
   }
 
