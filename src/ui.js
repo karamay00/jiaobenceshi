@@ -13,10 +13,20 @@ const panelHtml = `
       <button id="close-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">×</button>
     </div>
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px;">
+      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 150px 150px 1fr; gap: 5px;">
         <div>📊 <strong>结果：</strong><span id="period">-</span><span id="game-result">-</span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
-        <div>💰 <strong>状态：</strong><span id="status">-</span></div>
+        <div style="grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding-left: 10px;">
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: white; font-size: 13px; font-weight: bold;">
+            <input type="radio" name="betting-mode" value="auto" checked style="cursor: pointer; width: 16px; height: 16px;">
+            自动
+          </label>
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: white; font-size: 13px; font-weight: bold;">
+            <input type="radio" name="betting-mode" value="manual" style="cursor: pointer; width: 16px; height: 16px;">
+            手动
+          </label>
+        </div>
+        <div style="grid-column: 1;">💰 <strong>状态：</strong><span id="status">-</span></div>
         <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>
         <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
           <span style="flex-shrink: 0;">💰 <strong>输赢：</strong></span>
