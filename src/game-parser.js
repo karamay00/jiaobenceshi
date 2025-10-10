@@ -4,6 +4,16 @@
 function parseGamePhase(logData) {
   if (!logData || !logData.url) return;
 
+  // 信号过滤：根据模式决定是否处理
+  if (window.bettingMode === 'manual' && !logData.manual) {
+    // 手动模式下，忽略服务器信号
+    return;
+  }
+  if (window.bettingMode === 'auto' && logData.manual) {
+    // 自动模式下，忽略手动按钮信号
+    return;
+  }
+
   const url = logData.url;
 
   if (url.includes('/jiang/开局.png') || url.includes('/jiang/开宝.png')) {
@@ -27,6 +37,16 @@ function parseDataAndDisplay(logData) {
   // 如果没有传入数据，使用最新的一条
   const data = logData || (window.logs.length ? window.logs[window.logs.length - 1] : null);
   if (!data) return;
+
+  // 信号过滤：根据模式决定是否处理
+  if (window.bettingMode === 'manual' && !data.manual) {
+    // 手动模式下，忽略服务器信号
+    return;
+  }
+  if (window.bettingMode === 'auto' && data.manual) {
+    // 自动模式下，忽略手动按钮信号
+    return;
+  }
 
   if (data.msg && Array.isArray(data.msg)) {
     // 获取期号和结果 - 只解析包含"期结果"的消息

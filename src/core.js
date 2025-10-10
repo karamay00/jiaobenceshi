@@ -52,6 +52,8 @@ window.winLoseHistory = [];   // 存储每期输赢记录
 window.patternStates = {};    // 管理所有牌路的激活状态
 window.currentBets = null;    // 当前期的下注记录
 window.lastPeriodBets = null; // 上一期的下注记录（含输赢结果）
+window.bettingMode = 'manual'; // 下注模式：'auto' 或 'manual'（默认手动）
+window.mockBetting = true;     // 模拟下注模式（手动模式默认开启）
 
 // 保存最新的霸天虎状态
 window.bthStatus = {

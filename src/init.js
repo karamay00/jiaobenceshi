@@ -1,13 +1,11 @@
 // ========== 初始化和事件绑定 ==========
 
-// 新增牌路按钮事件
-document.getElementById('add-pattern').addEventListener('click', () => createPattern());
-
-// 清空牌路按钮事件
-document.getElementById('clear-history').addEventListener('click', () => {
+// 清空所有数据（历史、状态、牌路）
+function clearAllData() {
   // 1. 清空历史记录
   window.gameHistory = [];
   window.logs = [];
+  window.winLoseHistory = [];
 
   // 2. 重置霸天虎状态
   window.bthStatus = {
@@ -34,7 +32,15 @@ document.getElementById('clear-history').addEventListener('click', () => {
   // 4. 更新面板显示
   updatePanel();
 
-  console.log('[清空牌路] 已清空历史和所有牌路状态');
+  console.log('[清空数据] 已清空历史和所有牌路状态');
+}
+
+// 新增牌路按钮事件
+document.getElementById('add-pattern').addEventListener('click', () => createPattern());
+
+// 清空牌路按钮事件
+document.getElementById('clear-history').addEventListener('click', () => {
+  clearAllData();
 });
 
 // 关闭面板按钮事件
@@ -59,6 +65,21 @@ document.getElementById('toggle-panel').addEventListener('click', () => {
     toggleBtn.textContent = '▲';
     console.log('%c面板已收起', 'color: orange');
   }
+});
+
+// 监听自动/手动模式切换
+document.querySelectorAll('input[name="betting-mode"]').forEach(radio => {
+  radio.addEventListener('change', (e) => {
+    const mode = e.target.value; // 'auto' 或 'manual'
+    window.bettingMode = mode;
+    window.mockBetting = (mode === 'manual'); // 手动模式开启模拟下注
+
+    console.log(`%c[模式切换] ${mode === 'auto' ? '自动模式' : '手动模式'}`, 'color: orange; font-weight: bold');
+    console.log(`%c[模式切换] mockBetting = ${window.mockBetting}`, 'color: orange');
+
+    // 清空所有数据
+    clearAllData();
+  });
 });
 
 // 初始化牌路：尝试加载保存的配置，如果没有则创建默认配置

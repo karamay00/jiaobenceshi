@@ -13,10 +13,11 @@ const panelHtml = `
       <button id="close-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">×</button>
     </div>
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0;">
-      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 150px 150px auto auto 1fr; gap: 5px;">
+      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 180px 150px auto auto 1fr; gap: 5px;">
         <div>📊 <strong>结果：</strong><span id="period">-</span><span id="game-result"></span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
-        <div style="grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 8px; padding-left: 10px;">
+        <div style="grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 5px; padding-left: 10px;">
+          <div id="update-time" style="font-size: 10px; color: white; display: none;">-</div>
           <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: white; font-size: 13px; font-weight: bold;">
             <input type="radio" name="betting-mode" value="auto" style="cursor: pointer; width: 16px; height: 16px;">
             自动
@@ -142,7 +143,7 @@ function updatePanel() {
     gamePhaseSpan.style.fontWeight = 'normal';
   }
 
-  document.getElementById('period').textContent = (bth.period ? '第' + bth.period + '期 ' : '-');
+  document.getElementById('period').textContent = (bth.period ? bth.period + '期 ' : '-');
   document.getElementById('game-result').textContent = (bth.result || '') + (bth.resultNumber || '');
 
   const statusSpan = document.getElementById('status');
@@ -163,6 +164,15 @@ function updatePanel() {
   }
 
   document.getElementById('total-score').textContent = bth.totalScore || '-';
+
+  // 更新时间显示（仅在自动模式显示）
+  const updateTimeElement = document.getElementById('update-time');
+  if (window.bettingMode === 'auto') {
+    updateTimeElement.style.display = 'block';
+    updateTimeElement.textContent = bth.time || '-';
+  } else {
+    updateTimeElement.style.display = 'none';
+  }
 
   // 更新输赢历史
   const winLoseHistorySpan = document.getElementById('win-lose-history');

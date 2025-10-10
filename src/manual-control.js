@@ -1,8 +1,5 @@
 // ========== 手动控制功能 ==========
 
-// 模拟下注模式（测试用，发布时必须为false）
-window.mockBetting = false;
-
 // 手动下注选择器颜色切换
 document.getElementById('manual-bet-select').addEventListener('change', function() {
   // 如果值包含"庄"显示红色，包含"閒"显示蓝色
@@ -30,12 +27,12 @@ document.getElementById('manual-bet-confirm').addEventListener('click', () => {
     nextPeriod = '001';
   }
 
-  // 发送开奖消息
-  console.log({ msg: [`第${nextPeriod}期结果：${selectedResult}`] });
+  // 发送开奖消息（带 manual 标记）
+  console.log({ msg: [`第${nextPeriod}期结果：${selectedResult}`], manual: true });
 
   // 延迟100ms后发送开盘消息并恢复按钮
   setTimeout(() => {
-    console.log({ url: '/jiang/开局.png' });
+    console.log({ url: '/jiang/开局.png', manual: true });
 
     // 恢复按钮
     btn.disabled = false;
