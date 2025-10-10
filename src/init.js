@@ -61,11 +61,6 @@ document.getElementById('toggle-panel').addEventListener('click', () => {
   }
 });
 
-// 手动下注选择器颜色切换
-document.getElementById('manual-bet-select').addEventListener('change', function() {
-  this.style.background = this.value === '庄' ? 'red' : 'blue';
-});
-
 // 初始化牌路：尝试加载保存的配置，如果没有则创建默认配置
 const savedData = loadPatterns();
 if (savedData && savedData.patterns && savedData.patterns.length > 0) {

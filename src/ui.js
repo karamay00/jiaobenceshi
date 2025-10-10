@@ -30,8 +30,10 @@ const panelHtml = `
           <select id="manual-bet-select" style="padding: 5px 10px; background: red; color: white; border: 1px solid #1976D2; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">
             <option value="庄">庄</option>
             <option value="閒">閒</option>
+            <option value="庄6">庄6</option>
+            <option value="閒6">閒6</option>
           </select>
-          <button id="manual-bet-confirm" style="padding: 5px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">开奖</button>
+          <button id="manual-bet-confirm" style="padding: 5px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; font-weight: bold;">开奖并开盘</button>
         </div>
         <div style="grid-column: 1;">💰 <strong>状态：</strong><span id="status">-</span></div>
         <div>🎮 <strong>游戏：</strong><span id="game-phase">-</span></div>

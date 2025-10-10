@@ -15,6 +15,7 @@ const moduleFiles = [
   'src/patterns/preset.js',
   'src/patterns/custom.js',
   'src/game-parser.js',
+  'src/manual-control.js',
   'src/init.js'
 ];
 
