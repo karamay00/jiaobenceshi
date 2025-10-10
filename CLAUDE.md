@@ -8,6 +8,9 @@
 node build.js
 ```
 
+**⚠️ 重要：发布前检查**
+- 确保 `src/core.js` 中 `window.mockBetting = false`（生产环境必须关闭模拟模式）
+
 这个命令会自动完成：
 1. 从 src/ 目录合并所有模块文件生成 script.js
 2. 将 script.js 编码生成 bookmarklet 代码
@@ -26,6 +29,27 @@ node auto-run.js
 2. 更新书签到最新版本
 3. 打开Chrome并访问 http://zzxxyy.shop/
 4. 用户只需登录后点击书签栏的"运行脚本"
+
+### 模拟测试模式
+用于不联网环境下测试下注和盈亏计算功能：
+
+**启用模拟模式：**
+```javascript
+// 在浏览器控制台输入
+window.mockBetting = true;
+```
+
+**测试流程：**
+1. 开启模拟模式后，脚本会自动模拟下注成功（不发送网络请求）
+2. 触发下注：`console.log({ url: '/jiang/开局.png' })`
+3. 触发开奖：`console.log({ msg: ['5期结果：庄9', '(霸天虎)[100][50]'] })`
+4. 查看盈亏计算和UI更新是否正常
+
+**关闭模拟模式：**
+```javascript
+// 恢复真实下注
+window.mockBetting = false;
+```
 
 ## 项目说明
 

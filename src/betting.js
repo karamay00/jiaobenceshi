@@ -2,6 +2,19 @@
 
 // 下注功能
 function placeBet(message, patternId) {
+  // 模拟模式：直接返回成功响应，不发送网络请求
+  if (window.mockBetting) {
+    const mockResponse = {code: 0, msg: [], message: "操作成功（模拟）"};
+    console.log('[下注结果-模拟]', mockResponse);
+
+    if (window.currentBets && window.currentBets.bets[patternId]) {
+      window.currentBets.bets[patternId].betSuccess = true;
+      console.log(`[下注状态更新] ${patternId} betSuccess=true (模拟模式)`);
+    }
+    return;  // 不发送真实请求
+  }
+
+  // 真实模式：发送网络请求
   fetch('http://zzxxyy.shop/doXiazhu.html', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
