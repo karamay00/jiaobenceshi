@@ -421,6 +421,8 @@ function calculateProfits() {
   const openResult = window.currentBets.openResult;  // "庄"或"閒"
   console.log(`[计算输赢] 开奖结果: ${openResult}`);
 
+  let totalPeriodProfit = 0;  // 本期所有牌路的总盈亏
+
   for (let patternId in window.currentBets.bets) {
     const bet = window.currentBets.bets[patternId];
 
@@ -447,6 +449,9 @@ function calculateProfits() {
       console.log(`[计算输赢] ${patternId} 输 ${profit}`);
     }
 
+    // 累加本期总盈亏
+    totalPeriodProfit += profit;
+
     // 更新累计盈亏
     if (window.patternStates[patternId]) {
       if (!window.patternStates[patternId].totalProfit) {
@@ -457,6 +462,12 @@ function calculateProfits() {
       // 更新UI显示
       updateProfitUI(patternId);
     }
+  }
+
+  // 只在手动模式下追加本期总盈亏到历史
+  if (window.bettingMode === 'manual') {
+    window.winLoseHistory.push(totalPeriodProfit);
+    console.log(`[手动模式] 本期总盈亏: ${totalPeriodProfit}`);
   }
 }
 

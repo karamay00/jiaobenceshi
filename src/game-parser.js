@@ -87,7 +87,10 @@ function parseDataAndDisplay(logData) {
           window.bthStatus.status = status;
           window.bthStatus.winLose = winLose;
           window.bthStatus.totalScore = totalScore;
-          window.winLoseHistory.push(winLose); // 追加到输赢历史
+          // 只在自动模式下追加霸天虎数据到输赢历史
+          if (window.bettingMode === 'auto') {
+            window.winLoseHistory.push(winLose);
+          }
         } else if (matches && matches.length === 1) {
           // 只有一个数字，是总分，本期没有输赢
           const totalScore = parseInt(matches[0].replace(/[\[\]]/g, ''), 10);
@@ -96,7 +99,10 @@ function parseDataAndDisplay(logData) {
           window.bthStatus.status = '未下注';
           window.bthStatus.winLose = 0;
           window.bthStatus.totalScore = totalScore;
-          window.winLoseHistory.push(0); // 追加到输赢历史
+          // 只在自动模式下追加霸天虎数据到输赢历史
+          if (window.bettingMode === 'auto') {
+            window.winLoseHistory.push(0);
+          }
         }
       }
     });
@@ -106,7 +112,10 @@ function parseDataAndDisplay(logData) {
       console.log(`霸天虎 本期未下注`);
       window.bthStatus.status = '未下注';
       window.bthStatus.winLose = 0;
-      window.winLoseHistory.push(0); // 追加到输赢历史
+      // 只在自动模式下追加霸天虎数据到输赢历史
+      if (window.bettingMode === 'auto') {
+        window.winLoseHistory.push(0);
+      }
       // 保持上一期的总分
     }
 
