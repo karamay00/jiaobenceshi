@@ -434,9 +434,16 @@ function calculateProfits() {
     let profit = 0;
     if (bet.betType === openResult) {
       profit = bet.betAmount;  // 赢
+
+      // 特殊处理：庄6赢只赔一半
+      if (openResult === '庄' && window.bthStatus.resultNumber === '6') {
+        profit = Math.round(profit / 2);
+        console.log(`[庄6规则] ${patternId} 赢的金额减半: ${bet.betAmount} → ${profit}`);
+      }
+
       console.log(`[计算输赢] ${patternId} 赢 +${profit}`);
     } else {
-      profit = -bet.betAmount;  // 输
+      profit = -bet.betAmount;  // 输（不受庄6影响）
       console.log(`[计算输赢] ${patternId} 输 ${profit}`);
     }
 

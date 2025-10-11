@@ -1,13 +1,12 @@
 // ========== 初始化和事件绑定 ==========
 
-// 清空所有数据（历史、状态、牌路）
-function clearAllData() {
-  // 1. 清空历史记录
-  window.gameHistory = [];
+// 清空下注数据（仅保留开奖历史用于牌路匹配）
+function clearBettingData() {
+  // 1. 清空日志和输赢历史
   window.logs = [];
   window.winLoseHistory = [];
 
-  // 2. 重置霸天虎状态
+  // 2. 完全重置霸天虎状态
   window.bthStatus = {
     period: '',
     result: '',
@@ -31,7 +30,12 @@ function clearAllData() {
 
   // 4. 更新面板显示
   updatePanel();
+}
 
+// 清空所有数据（历史、状态、牌路）
+function clearAllData() {
+  window.gameHistory = [];
+  clearBettingData();
   console.log('[清空数据] 已清空历史和所有牌路状态');
 }
 
@@ -77,8 +81,9 @@ document.querySelectorAll('input[name="betting-mode"]').forEach(radio => {
     console.log(`%c[模式切换] ${mode === 'auto' ? '自动模式' : '手动模式'}`, 'color: orange; font-weight: bold');
     console.log(`%c[模式切换] mockBetting = ${window.mockBetting}`, 'color: orange');
 
-    // 清空所有数据
-    clearAllData();
+    // 清空下注数据，保留开奖历史
+    clearBettingData();
+    console.log('[模式切换] 已清空下注数据，保留开奖历史');
   });
 });
 
