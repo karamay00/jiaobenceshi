@@ -55,6 +55,11 @@ window.lastPeriodBets = null; // 上一期的下注记录（含输赢结果）
 window.bettingMode = 'manual'; // 下注模式：'auto' 或 'manual'（默认手动）
 window.mockBetting = true;     // 模拟下注模式（手动模式默认开启）
 
+// 下注策略配置（手动模式默认配置）
+window.smartMerge = false;     // 是否启用智能合并（默认false=顺序下注，true=庄闲同时出现下大）
+window.initialBetDelay = 15000; // 初始延迟时间（毫秒，手动模式15秒）
+window.betInterval = 3000;     // 下注间隔时间（毫秒，手动模式3秒）
+
 // 保存最新的霸天虎状态
 window.bthStatus = {
   period: '',

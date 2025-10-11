@@ -71,12 +71,35 @@ document.getElementById('toggle-panel').addEventListener('click', () => {
   }
 });
 
+// 监听下注策略切换
+document.getElementById('betting-strategy').addEventListener('change', (e) => {
+  const strategy = e.target.value;
+  if (strategy === 'sequential') {
+    window.smartMerge = false;  // 顺序下注
+    console.log('%c[策略切换] 顺序下注', 'color: cyan');
+  } else if (strategy === 'both-bet-big') {
+    window.smartMerge = true;   // 庄闲同时出现下大
+    console.log('%c[策略切换] 庄闲同时出现下大', 'color: cyan');
+  }
+});
+
 // 监听自动/手动模式切换
 document.querySelectorAll('input[name="betting-mode"]').forEach(radio => {
   radio.addEventListener('change', (e) => {
     const mode = e.target.value; // 'auto' 或 'manual'
     window.bettingMode = mode;
     window.mockBetting = (mode === 'manual'); // 手动模式开启模拟下注
+
+    // 根据模式自动调整延迟配置
+    if (mode === 'manual') {
+      window.initialBetDelay = 15000;  // 15秒延迟
+      window.betInterval = 3000;       // 3秒间隔
+      console.log('%c[配置切换] 手动模式: 延迟15秒, 间隔3秒', 'color: cyan');
+    } else {
+      window.initialBetDelay = 0;      // 立即下注
+      window.betInterval = 0;          // 同时下注
+      console.log('%c[配置切换] 自动模式: 无延迟', 'color: cyan');
+    }
 
     console.log(`%c[模式切换] ${mode === 'auto' ? '自动模式' : '手动模式'}`, 'color: orange; font-weight: bold');
     console.log(`%c[模式切换] mockBetting = ${window.mockBetting}`, 'color: orange');

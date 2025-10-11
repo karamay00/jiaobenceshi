@@ -274,9 +274,9 @@ function checkActivation() {
   }
 }
 
-// 自动下注
-function autoPlaceBets() {
-  console.log('[自动下注] 开始检查所有牌路...');
+// 准备下注数据
+function prepareBets() {
+  const betsToPlace = [];
 
   // 初始化本期下注记录
   window.currentBets = {
@@ -285,6 +285,7 @@ function autoPlaceBets() {
     bets: {}
   };
 
+  // 遍历所有牌路
   for (let patternId in window.patternStates) {
     const state = window.patternStates[patternId];
 
@@ -323,32 +324,128 @@ function autoPlaceBets() {
       continue;
     }
 
-    // 记录下注信息（注意：用繁体"閒"）
+    // 记录到 currentBets（用于盈亏计算）
     window.currentBets.bets[patternId] = {
       betPlaced: true,
-      betType: betType,        // "庄"或"閒"
+      betType: betType,
       betAmount: amount,
-      betSuccess: false        // 默认false，等响应
+      betSuccess: false
     };
 
-    // 执行下注
-    // 将"閒"转换为"闲"用于服务器下注，庄保持不变
-    const serverBetType = betType === '閒' ? '闲' : betType;
-    const message = `${serverBetType}${amount}`;
-
-    // 生成牌路描述
-    let patternDesc;
-    if (state.type === 'preset') {
-      const numericId = patternId.split('-')[1];
-      patternDesc = `预设组${parseInt(numericId) + 1}-行${state.activeRowIndex + 1}-第${state.currentPointer}列`;
-    } else {
-      const numericId = patternId.split('-')[1];
-      patternDesc = `自定义牌路${numericId}-第${state.currentPointer}列`;
-    }
-
-    console.log(`[执行下注] ${patternDesc} 下注: ${message}`);
-    placeBet(message, patternId);  // 传入patternId
+    // 加入下注队列
+    betsToPlace.push({
+      patternId: patternId,
+      betType: betType,
+      betAmount: amount
+    });
   }
+
+  console.log(`[准备下注] 找到 ${betsToPlace.length} 个牌路需要下注`);
+  return betsToPlace;
+}
+
+// 智能合并矛盾下注
+function mergeConflictingBets(betsToPlace) {
+  // 统计庄和闲的总金额
+  let zhuangTotal = 0;
+  let xianTotal = 0;
+
+  betsToPlace.forEach(bet => {
+    if (bet.betType === '庄') {
+      zhuangTotal += bet.betAmount;
+    } else if (bet.betType === '閒') {
+      xianTotal += bet.betAmount;
+    }
+  });
+
+  console.log(`[智能合并] 庄总计: ${zhuangTotal}, 闲总计: ${xianTotal}`);
+
+  // 决策
+  let finalBetType;
+  if (zhuangTotal > xianTotal) {
+    finalBetType = '庄';
+    console.log(`[智能合并] 庄更大，只下庄`);
+  } else if (xianTotal > zhuangTotal) {
+    finalBetType = '閒';
+    console.log(`[智能合并] 闲更大，只下闲`);
+  } else {
+    finalBetType = betsToPlace[0].betType;
+    console.log(`[智能合并] 金额相同，选择第一个: ${finalBetType}`);
+  }
+
+  // 过滤
+  const finalBets = betsToPlace.filter(bet => bet.betType === finalBetType);
+
+  // 更新 currentBets：移除被过滤的牌路
+  for (let patternId in window.currentBets.bets) {
+    const bet = window.currentBets.bets[patternId];
+    if (bet.betPlaced && bet.betType !== finalBetType) {
+      // 标记为未下注（被过滤）
+      window.currentBets.bets[patternId].betPlaced = false;
+      console.log(`[智能合并] ${patternId} 被过滤（${bet.betType}）`);
+    }
+  }
+
+  console.log(`[智能合并] 过滤后剩余 ${finalBets.length} 个牌路`);
+  return finalBets;
+}
+
+// 延迟批量下注
+function placeQueuedBets(finalBets) {
+  // 初始延迟（可配置）
+  const initialDelay = window.initialBetDelay || 0;
+
+  setTimeout(() => {
+    console.log(`[批量下注] 开始下注 ${finalBets.length} 个牌路`);
+
+    finalBets.forEach((bet, index) => {
+      // 每个下注之间的延迟（可配置）
+      const intervalDelay = window.betInterval || 0;
+      const delay = index * intervalDelay;
+
+      setTimeout(() => {
+        // 临时生成 message
+        const serverBetType = bet.betType === '閒' ? '闲' : bet.betType;
+        const message = `${serverBetType}${bet.betAmount}`;
+
+        // 生成牌路描述
+        const state = window.patternStates[bet.patternId];
+        let patternDesc;
+        if (state.type === 'preset') {
+          const numericId = bet.patternId.split('-')[1];
+          patternDesc = `预设组${parseInt(numericId) + 1}-行${state.activeRowIndex + 1}-第${state.currentPointer}列`;
+        } else {
+          const numericId = bet.patternId.split('-')[1];
+          patternDesc = `自定义牌路${numericId}-第${state.currentPointer}列`;
+        }
+
+        console.log(`[执行下注] ${patternDesc} 下注: ${message}`);
+        placeBet(message, bet.patternId);
+      }, delay);
+    });
+  }, initialDelay);
+}
+
+// 自动下注（重构后）
+function autoPlaceBets() {
+  console.log('[自动下注] 开始检查所有牌路...');
+
+  // 第一步：准备下注数据
+  const betsToPlace = prepareBets();
+
+  if (betsToPlace.length === 0) {
+    console.log('[自动下注] 没有需要下注的牌路');
+    console.log('[下注记录] 已生成', window.currentBets);
+    return;
+  }
+
+  // 第二步：智能合并（可选，根据配置开关）
+  const finalBets = window.smartMerge
+    ? mergeConflictingBets(betsToPlace)
+    : betsToPlace;
+
+  // 第三步：延迟批量下注
+  placeQueuedBets(finalBets);
 
   console.log('[下注记录] 已生成', window.currentBets);
 }
