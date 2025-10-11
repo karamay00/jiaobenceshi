@@ -8,9 +8,6 @@
 node build.js
 ```
 
-**⚠️ 重要：发布前检查**
-- 确保 `src/core.js` 中 `window.mockBetting = false`（生产环境必须关闭模拟模式）
-
 这个命令会自动完成：
 1. 从 src/ 目录合并所有模块文件生成 script.js
 2. 将 script.js 编码生成 bookmarklet 代码
