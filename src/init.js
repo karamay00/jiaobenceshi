@@ -54,9 +54,32 @@ document.getElementById('close-panel').addEventListener('click', () => {
 });
 
 // 折叠/展开面板功能
-document.getElementById('toggle-panel').addEventListener('click', () => {
+const toggleBtn = document.getElementById('toggle-panel');
+const panelTitle = document.getElementById('panel-title');
+
+// 添加拖拽功能（mousedown 监听器）
+if (toggleBtn && window.dragStart) {
+  toggleBtn.addEventListener('mousedown', window.dragStart);
+}
+
+if (panelTitle && window.dragStart) {
+  panelTitle.addEventListener('mousedown', window.dragStart);
+}
+
+// 阻止收起按钮的 click 事件在拖动后触发（使用 capture 阶段确保优先执行）
+toggleBtn.addEventListener('click', (e) => {
+  if (window.hasMoved) {
+    e.preventDefault();
+    e.stopPropagation();
+    e.stopImmediatePropagation();
+    window.hasMoved = false;
+    return false;
+  }
+}, true);
+
+// 折叠/展开切换功能
+toggleBtn.addEventListener('click', (e) => {
   const panel = document.getElementById('custom-panel');
-  const toggleBtn = document.getElementById('toggle-panel');
 
   if (panel.classList.contains('collapsed')) {
     // 展开面板

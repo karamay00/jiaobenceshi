@@ -224,6 +224,10 @@ setInterval(updatePanel, 5000); // 每5秒更新一次面板
 
 // 拖拽状态
 let isDragging = false;
+let hasMoved = false; // 是否发生了移动
+let dragStartTime = 0; // 记录按下时间
+let dragStartX = 0; // 记录按下时的X坐标
+let dragStartY = 0; // 记录按下时的Y坐标
 let currentX;
 let currentY;
 let initialX;
@@ -231,32 +235,55 @@ let initialY;
 let xOffset = 0;
 let yOffset = 0;
 
-// 获取面板和标题元素
-const panel = document.getElementById('custom-panel');
-const panelTitle = document.getElementById('panel-title');
+// 获取面板和标题元素（声明为全局变量，供拖拽函数使用）
+window.dragPanel = document.getElementById('custom-panel');
+window.dragPanelTitle = document.getElementById('panel-title');
+window.dragToggleButton = document.getElementById('toggle-panel');
 
-// 鼠标按下开始拖拽
-panelTitle.addEventListener('mousedown', dragStart);
+// 暴露拖拽函数给全局，供 init.js 调用
+window.dragStart = function(e) {
+  // 阻止默认行为，防止文本选择或其他干扰
+  e.preventDefault();
 
-function dragStart(e) {
+  const panel = window.dragPanel;
+  const panelTitle = window.dragPanelTitle;
+  const toggleButton = window.dragToggleButton;
+
   // 获取当前面板位置
   const rect = panel.getBoundingClientRect();
 
   initialX = e.clientX - rect.left;
   initialY = e.clientY - rect.top;
 
-  if (e.target === panelTitle) {
+  // 允许标题栏和收起按钮都可以拖拽
+  if (e.target === panelTitle || e.target === toggleButton) {
     isDragging = true;
+    hasMoved = false; // 重置移动标志
+    dragStartTime = Date.now(); // 记录按下时间
+    dragStartX = e.clientX; // 记录按下时的X坐标
+    dragStartY = e.clientY; // 记录按下时的Y坐标
 
     // 添加全局事件监听
     document.addEventListener('mousemove', drag);
     document.addEventListener('mouseup', dragEnd);
   }
-}
+};
 
 function drag(e) {
   if (isDragging) {
     e.preventDefault();
+
+    const panel = window.dragPanel;
+
+    // 计算鼠标移动距离
+    const moveX = Math.abs(e.clientX - dragStartX);
+    const moveY = Math.abs(e.clientY - dragStartY);
+    const moveDistance = Math.sqrt(moveX * moveX + moveY * moveY);
+
+    // 只有移动距离超过5像素才认为是拖动
+    if (moveDistance > 5) {
+      hasMoved = true;
+    }
 
     currentX = e.clientX - initialX;
     currentY = e.clientY - initialY;
@@ -284,12 +311,15 @@ function dragEnd(e) {
   if (isDragging) {
     isDragging = false;
 
+    // 将移动标志暴露给全局，供 click 事件检查
+    window.hasMoved = hasMoved;
+
     // 移除全局事件监听
     document.removeEventListener('mousemove', drag);
     document.removeEventListener('mouseup', dragEnd);
 
-    // 保存位置到 localStorage
-    if (typeof savePanelPosition === 'function') {
+    // 如果发生了移动，保存位置到 localStorage
+    if (hasMoved && typeof savePanelPosition === 'function') {
       savePanelPosition(xOffset, yOffset);
     }
   }
