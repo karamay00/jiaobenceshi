@@ -90,11 +90,11 @@ function updatePatternUI(patternId, state) {
     }
   } else {
     statusElement.textContent = '[未激活]';
-    statusElement.style.color = '#fff';
+    statusElement.style.color = 'black';
 
     if (collapsedStatusElement) {
       collapsedStatusElement.textContent = '[未激活]';
-      collapsedStatusElement.style.color = '#fff';
+      collapsedStatusElement.style.color = 'black';
     }
   }
 

@@ -2,7 +2,7 @@
 
 // 小面板的 HTML 结构
 const panelHtml = `
-  <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; height: 95vh; background: rgba(128, 128, 128, 0.6); color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
+  <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; height: 95vh; background: #808080; color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">
       <button id="toggle-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #2196F3; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">▼</button>
       <span id="brand-name" style="color: black; font-weight: bold; font-size: 16px; line-height: 25px; padding: 0; margin-left: 24px; flex: none;">永利自动投注分析器</span>

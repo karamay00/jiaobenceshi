@@ -75,7 +75,7 @@ function createPresetPatternGroup(config, initialData = null) {
   // 创建组容器
   const groupDiv = document.createElement('div');
   groupDiv.id = `group-preset-${groupId}`;
-  groupDiv.style.cssText = 'margin-bottom: 8px; background: rgba(0, 0, 0, 0.5); padding: 2px; border-radius: 5px;';
+  groupDiv.style.cssText = 'margin-bottom: 8px; background: rgba(255, 255, 255, 0.8); padding: 2px; border-radius: 5px;';
 
   // 创建表格容器
   const tableContainer = document.createElement('div');
@@ -110,17 +110,17 @@ function createPresetPatternGroup(config, initialData = null) {
   tableContainer.appendChild(inputRow);
   selectRows.forEach(row => tableContainer.appendChild(row));
 
-  // 获取第一行前6个牌型用于预览（带颜色和描边）
+  // 获取第一行前6个牌型用于预览（带颜色）
   const patternPreview = duplicatedPatterns[0].slice(0, 6)
     .map(val => {
       const color = val === '庄' ? 'red' : 'blue';
-      return `<span style="color: ${color}; -webkit-text-stroke: 0.7px white; text-stroke: 0.7px white;">${val}</span>`;
+      return `<span style="color: ${color};">${val}</span>`;
     })
     .join('');
 
   // 底部控制栏（在最左边添加折叠按钮）
   const controlBar = document.createElement('div');
-  controlBar.style.cssText = 'margin-top: 10px; display: flex; align-items: center; gap: 10px; color: white; font-size: 12px;';
+  controlBar.style.cssText = 'margin-top: 10px; display: flex; align-items: center; gap: 10px; color: black; font-size: 12px;';
   controlBar.innerHTML = `
     <button id="toggle-expand-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▼</button>
     <span style="flex: 1;">本组累计盈亏：<span id="profit-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
@@ -140,12 +140,12 @@ function createPresetPatternGroup(config, initialData = null) {
   // 创建概览容器（默认隐藏）
   const collapsedContainer = document.createElement('div');
   collapsedContainer.id = `collapsed-preset-${groupId}`;
-  collapsedContainer.style.cssText = 'display: none; padding: 2px 0; color: white; font-size: 12px;';
+  collapsedContainer.style.cssText = 'display: none; padding: 2px 0; color: black; font-size: 12px;';
   collapsedContainer.innerHTML = `
     <div style="display: flex; align-items: center; gap: 8px;">
       <button id="toggle-collapse-preset-${groupId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▲</button>
       <span style="font-weight: bold;">${patternPreview}</span>
-      <span id="status-collapsed-preset-${groupId}" style="color: #fff;">[未激活]</span>
+      <span id="status-collapsed-preset-${groupId}" style="color: black;">[未激活]</span>
       <input type="checkbox" id="enable-collapsed-preset-${groupId}" style="width: 18px; height: 18px; cursor: pointer; margin-left: 8px;">
       <label for="enable-collapsed-preset-${groupId}" style="cursor: pointer; font-size: 11px;">启用</label>
       <span style="flex: 1; text-align: right;">本组累计盈亏：<span id="profit-collapsed-preset-${groupId}" style="font-weight: bold; color: #4CAF50;">0</span></span>
