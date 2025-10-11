@@ -50,8 +50,8 @@ const panelHtml = `
         </div>
       </div>
       <div style="display: flex; gap: 5px; margin-bottom: 10px;">
-        <button id="add-pattern" style="flex: 1; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
-        <button id="clear-history" style="flex: 1; padding: 8px; background: #FF9800; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">清空牌路</button>
+        <button id="add-pattern" style="width: 15%; padding: 8px; background: #2196F3; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">新增牌路并下注</button>
+        <button id="clear-history" style="width: 15%; padding: 8px; background: #FF9800; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: auto;">清空历史记录</button>
       </div>
       <div id="pattern-container" style="flex: 1; overflow-y: auto; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 5px; min-height: 0;"></div>
     </div>
