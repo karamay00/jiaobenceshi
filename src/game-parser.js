@@ -70,19 +70,19 @@ function parseDataAndDisplay(logData) {
     window.bthStatus.resultNumber = resultNumber;
     window.bthStatus.time = new Date().toLocaleTimeString();
 
-    // 查找霸天虎信息
+    // 查找玩家信息
     let foundBTH = false;
     data.msg.forEach(m => {
-      if (m.includes('(霸天虎)')) {
+      if (m.includes(`(${window.playerName})`)) {
         foundBTH = true;
-        // 匹配格式：(霸天虎)[总分] [本期输赢] 或 (霸天虎)[总分]
+        // 匹配格式：(玩家名)[总分] [本期输赢] 或 (玩家名)[总分]
         const matches = m.match(/\[([^\]]+)\]/g); // 匹配所有 [xxx]
         if (matches && matches.length >= 2) {
           // 有两个数字，第二个是本期输赢
           const totalScore = parseInt(matches[0].replace(/[\[\]]/g, ''), 10);
           const winLose = parseInt(matches[1].replace(/[\[\]]/g, ''), 10);
           const status = winLose > 0 ? '赢了' : winLose < 0 ? '输了' : '平局';
-          console.log(`霸天虎 ${status}, 本期: ${winLose}, 总分: ${totalScore}`);
+          console.log(`${window.playerName} ${status}, 本期: ${winLose}, 总分: ${totalScore}`);
 
           window.bthStatus.status = status;
           window.bthStatus.winLose = winLose;
@@ -94,7 +94,7 @@ function parseDataAndDisplay(logData) {
         } else if (matches && matches.length === 1) {
           // 只有一个数字，是总分，本期没有输赢
           const totalScore = parseInt(matches[0].replace(/[\[\]]/g, ''), 10);
-          console.log(`霸天虎 本期未下注, 总分: ${totalScore}`);
+          console.log(`${window.playerName} 本期未下注, 总分: ${totalScore}`);
 
           window.bthStatus.status = '未下注';
           window.bthStatus.winLose = 0;
@@ -107,9 +107,9 @@ function parseDataAndDisplay(logData) {
       }
     });
 
-    // 如果消息里没有霸天虎，说明这期没下注
+    // 如果消息里没有玩家信息，说明这期没下注
     if (!foundBTH) {
-      console.log(`霸天虎 本期未下注`);
+      console.log(`${window.playerName} 本期未下注`);
       window.bthStatus.status = '未下注';
       window.bthStatus.winLose = 0;
       // 只在自动模式下追加霸天虎数据到输赢历史

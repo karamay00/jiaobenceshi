@@ -1,5 +1,8 @@
 // ========== Console 拦截和全局状态初始化 ==========
 
+// 玩家名称配置（可修改）
+window.playerName = '霸天虎';
+
 // 检查面板是否已经存在
 const existingPanel = document.getElementById('custom-panel');
 if (existingPanel) {
