@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>游戏测试服务器</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎮 游戏测试服务器</h1>
+      <div class="status">
+        <span id="period">期号: -</span>
+        <span id="phase">状态: -</span>
+        <span id="result">结果: -</span>
+      </div>
+    </header>
+
+    <div class="main">
+      <!-- 左侧：游戏区域 -->
+      <div class="game-area">
+        <h2>游戏界面</h2>
+
+        <div class="history">
+          <h3>开奖历史</h3>
+          <div id="history-list"></div>
+        </div>
+
+        <div class="game-display">
+          <div class="console-display">
+            <div class="console-header">
+              <span>📟 Console 消息</span>
+              <button onclick="clearConsole()" class="btn-clear-console">清空</button>
+            </div>
+            <div id="console-output"></div>
+          </div>
+
+          <div class="raw-log-display">
+            <div class="console-header">
+              <span>📋 原始 Log</span>
+              <button onclick="clearRawLog()" class="btn-clear-console">清空</button>
+            </div>
+            <div id="raw-log-output"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：控制面板 -->
+      <div class="control-panel">
+        <h2>控制面板</h2>
+
+        <div class="panel-section">
+          <h3>游戏模式</h3>
+          <select id="mode-select">
+            <option value="auto">自动随机</option>
+            <option value="pattern">固定牌路</option>
+            <option value="manual">手动控制</option>
+          </select>
+        </div>
+
+        <div class="panel-section">
+          <h3>自定义牌路</h3>
+          <input type="text" id="pattern-input" placeholder="庄,庄,閒,庄,庄,閒">
+          <button onclick="setPattern()">设置牌路</button>
+        </div>
+
+        <div class="panel-section">
+          <h3>手动开奖</h3>
+          <div class="manual-controls">
+            <button onclick="manualDraw('庄')">开 庄</button>
+            <button onclick="manualDraw('閒')">开 閒</button>
+          </div>
+          <p class="hint">* 仅在"手动控制"模式下生效</p>
+        </div>
+
+        <div class="panel-section">
+          <h3>周期时长</h3>
+          <input type="number" id="cycle-time" value="70" min="5" max="120">
+          <button onclick="setCycleTime()">设置（秒）</button>
+          <p class="hint">* 修改后下一期生效</p>
+        </div>
+
+        <div class="panel-section">
+          <h3>游戏控制</h3>
+          <div class="game-controls">
+            <button onclick="pauseGame()" class="btn-pause">⏸️ 停止发送消息</button>
+            <button onclick="restartGame()" class="btn-restart">🔄 重新发送消息</button>
+          </div>
+          <p class="hint">* 重新发送会从第1期重新开始</p>
+        </div>
+
+        <div class="panel-section">
+          <h3>下注记录</h3>
+          <div id="bet-records"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="client.js"></script>
+</body>
+</html>

@@ -3,27 +3,30 @@
 // 小面板的 HTML 结构
 const panelHtml = `
   <div id="custom-panel" style="position: fixed; top: 20px; right: 20px; height: 95vh; background: #808080; color: black; padding: 15px; border-radius: 10px; z-index: 9999; box-shadow: 0 4px 6px rgba(0,0,0,0.3); display: flex; flex-direction: column;">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px;">
-      <button id="toggle-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #2196F3; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">▼</button>
-      <span id="brand-name" style="color: black; font-weight: bold; font-size: 16px; line-height: 25px; padding: 0; margin-left: 24px; flex: none;">永利自动投注分析器</span>
-      <h3 id="panel-title" style="margin: 0; margin-right: 8px; flex: 1; text-align: center; cursor: move; user-select: none;">${window.playerName}面板</h3>
-      <select id="betting-strategy" style="height: 25px; padding: 0 5px; margin-right: 16px; background: #2196F3; color: white; border: 1px solid #1976D2; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold; flex: none;">
+    <div id="panel-header" style="position: relative; margin-bottom: 10px; border-bottom: 2px solid #4CAF50; padding-bottom: 8px; height: 25px; cursor: move;">
+      <button id="toggle-panel" style="position: absolute; left: 0; top: 0; width: 25px; height: 25px; background: #2196F3; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0;">▼</button>
+      <span id="brand-name" style="position: absolute; left: 35px; top: 0; color: black; font-weight: bold; font-size: 16px; line-height: 25px;">永利自动投注分析器</span>
+      <div id="panel-title" style="width: fit-content; margin: 0 auto; cursor: move; user-select: none;">
+        <input type="text" id="player-name-input" value="${window.playerName}" style="width: 80px; padding: 2px 5px; font-size: 14px; border-radius: 3px; border: 1px solid #ccc; text-align: center; vertical-align: middle;">
+        <button id="player-name-confirm" style="padding: 2px 8px; background: #4CAF50; color: white; border: none; border-radius: 3px; cursor: pointer; font-weight: bold; font-size: 12px; vertical-align: middle; margin-left: 5px;">确认</button>
+      </div>
+      <select id="betting-strategy" style="position: absolute; right: 35px; top: 0; width: 140px; height: 25px; padding: 0 5px; background: #2196F3; color: white; border: 1px solid #1976D2; border-radius: 5px; cursor: pointer; font-size: 12px; font-weight: bold;">
         <option value="sequential">顺序下注</option>
         <option value="both-bet-big">庄闲同时出现下大</option>
       </select>
-      <button id="close-panel" style="width: 25px; height: 25px; min-width: 25px; min-height: 25px; max-width: 25px; max-height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0; flex: none;">×</button>
+      <button id="close-panel" style="position: absolute; right: 0; top: 0; width: 25px; height: 25px; background: #f44336; color: white; border: none; border-radius: 50%; cursor: pointer; font-size: 16px; font-weight: bold; line-height: 1; padding: 0;">×</button>
     </div>
     <div id="panel-content" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; min-height: 0;">
-      <div id="bth-status" style="background: rgba(255,255,255,0.08); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 180px 150px auto auto 1fr; gap: 5px;">
+      <div id="bth-status" style="background: rgba(255,255,255,1); padding: 10px; border-radius: 5px; margin-bottom: 10px; font-size: 13px; display: grid; grid-template-columns: 180px 150px auto auto 1fr; gap: 5px;">
         <div>📊 <strong>结果：</strong><span id="period">-</span><span id="game-result"></span></div>
         <div>🏆 <strong>总分：</strong><span id="total-score">-</span></div>
         <div style="grid-column: 3; grid-row: 1 / 3; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 5px; padding-left: 10px;">
-          <div id="update-time" style="font-size: 10px; color: white; display: none;">-</div>
-          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: white; font-size: 13px; font-weight: bold;">
+          <div id="update-time" style="font-size: 10px; color: black; display: none;">-</div>
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: black; font-size: 13px; font-weight: bold;">
             <input type="radio" name="betting-mode" value="auto" style="cursor: pointer; width: 16px; height: 16px;">
             自动
           </label>
-          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: white; font-size: 13px; font-weight: bold;">
+          <label style="display: flex; align-items: center; gap: 5px; cursor: pointer; color: black; font-size: 13px; font-weight: bold;">
             <input type="radio" name="betting-mode" value="manual" checked style="cursor: pointer; width: 16px; height: 16px;">
             手动
           </label>
@@ -42,7 +45,7 @@ const panelHtml = `
         <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
           <span style="flex-shrink: 0;">💰 <strong>输赢：</strong></span>
           <span id="win-lose-history" style="flex: 1; overflow-x: auto; white-space: nowrap; border: 1px solid black; padding: 2px 5px; border-radius: 3px;">-</span>
-          <span id="total-score-display" style="flex-shrink: 0; width: 75px; text-align: right; font-weight: bold; border: 2px solid white; padding: 2px 5px; border-radius: 3px;">-</span>
+          <span id="total-score-display" style="flex-shrink: 0; width: 75px; text-align: right; font-weight: bold; border: 1px solid black; padding: 2px 5px; border-radius: 3px; color: black;">-</span>
         </div>
         <div style="grid-column: 1 / -1; font-size: 13px; color: black; display: flex; align-items: center; gap: 5px;">
           <span style="flex-shrink: 0;">📜 <strong>历史：</strong></span>
@@ -179,9 +182,9 @@ function updatePanel() {
   // 更新输赢历史
   const winLoseHistorySpan = document.getElementById('win-lose-history');
   if (window.winLoseHistory && window.winLoseHistory.length > 0) {
-    // 格式化输赢历史：正数加+显示绿色，负数显示红色，0显示白色
+    // 格式化输赢历史：正数加+显示绿色，负数显示红色，0显示黑色
     const formattedHistory = window.winLoseHistory.map(val => {
-      let color = 'white';
+      let color = 'black';
       let text = val.toString();
       if (val > 0) {
         color = '#4CAF50';
@@ -239,17 +242,19 @@ let yOffset = 0;
 
 // 获取面板和标题元素（声明为全局变量，供拖拽函数使用）
 window.dragPanel = document.getElementById('custom-panel');
-window.dragPanelTitle = document.getElementById('panel-title');
-window.dragToggleButton = document.getElementById('toggle-panel');
+window.dragPanelHeader = document.getElementById('panel-header');
 
 // 暴露拖拽函数给全局，供 init.js 调用
 window.dragStart = function(e) {
+  const panel = window.dragPanel;
+
+  // 如果点击的是输入框或按钮或下拉菜单，不触发拖拽
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.tagName === 'SELECT') {
+    return; // 直接返回，不阻止默认行为
+  }
+
   // 阻止默认行为，防止文本选择或其他干扰
   e.preventDefault();
-
-  const panel = window.dragPanel;
-  const panelTitle = window.dragPanelTitle;
-  const toggleButton = window.dragToggleButton;
 
   // 获取当前面板位置
   const rect = panel.getBoundingClientRect();
@@ -257,18 +262,15 @@ window.dragStart = function(e) {
   initialX = e.clientX - rect.left;
   initialY = e.clientY - rect.top;
 
-  // 允许标题栏和收起按钮都可以拖拽
-  if (e.target === panelTitle || e.target === toggleButton) {
-    isDragging = true;
-    hasMoved = false; // 重置移动标志
-    dragStartTime = Date.now(); // 记录按下时间
-    dragStartX = e.clientX; // 记录按下时的X坐标
-    dragStartY = e.clientY; // 记录按下时的Y坐标
+  isDragging = true;
+  hasMoved = false; // 重置移动标志
+  dragStartTime = Date.now(); // 记录按下时间
+  dragStartX = e.clientX; // 记录按下时的X坐标
+  dragStartY = e.clientY; // 记录按下时的Y坐标
 
-    // 添加全局事件监听
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', dragEnd);
-  }
+  // 添加全局事件监听
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', dragEnd);
 };
 
 function drag(e) {

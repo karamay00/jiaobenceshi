@@ -89,17 +89,17 @@ function createPattern(initialData = null) {
     })
     .join('');
 
-  // 创建展开容器（默认显示）
+  // 创建展开容器（默认隐藏）
   const expandedContainer = document.createElement('div');
   expandedContainer.id = `expanded-custom-${patternId}`;
-  expandedContainer.style.cssText = 'display: block;';
+  expandedContainer.style.cssText = 'display: none;';
   expandedContainer.appendChild(tableContainer);
   expandedContainer.appendChild(controlBar);
 
-  // 创建概览容器（默认隐藏）
+  // 创建概览容器（默认显示）
   const collapsedContainer = document.createElement('div');
   collapsedContainer.id = `collapsed-custom-${patternId}`;
-  collapsedContainer.style.cssText = 'display: none; padding: 2px 0; color: black; font-size: 12px;';
+  collapsedContainer.style.cssText = 'display: block; padding: 2px 0; color: black; font-size: 12px;';
   collapsedContainer.innerHTML = `
     <div style="display: flex; align-items: center; gap: 8px;">
       <button id="toggle-collapse-custom-${patternId}" style="width: 20px; height: 20px; background: #2196F3; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px; font-weight: bold; padding: 0; flex-shrink: 0;">▲</button>

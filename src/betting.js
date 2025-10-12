@@ -15,7 +15,7 @@ function placeBet(message, patternId) {
   }
 
   // 真实模式：发送网络请求
-  fetch('http://zzxxyy.shop/doXiazhu.html', {
+  fetch('/doXiazhu.html', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({
@@ -60,19 +60,20 @@ function updateGameHistory(result) {
 function updatePatternUI(patternId, state) {
   let statusElement, collapsedStatusElement;
 
-  // 统一处理：在累计盈亏后面添加状态显示（展开容器）
+  // 尝试获取展开容器的状态元素（可能不存在或被隐藏）
   const profitSpan = document.getElementById(`profit-${patternId}`);
-  if (!profitSpan) return;
 
-  statusElement = profitSpan.parentElement.querySelector('.activation-status');
-  if (!statusElement) {
-    statusElement = document.createElement('span');
-    statusElement.className = 'activation-status';
-    statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
-    profitSpan.parentElement.appendChild(statusElement);
+  if (profitSpan) {
+    statusElement = profitSpan.parentElement.querySelector('.activation-status');
+    if (!statusElement) {
+      statusElement = document.createElement('span');
+      statusElement.className = 'activation-status';
+      statusElement.style.cssText = 'margin-left: 10px; font-size: 11px;';
+      profitSpan.parentElement.appendChild(statusElement);
+    }
   }
 
-  // 概览容器中的状态显示
+  // 获取收起容器的状态元素（无论展开容器是否存在，都要尝试更新）
   collapsedStatusElement = document.getElementById(`status-collapsed-${patternId}`);
 
   // 更新显示内容（展开容器和概览容器）
@@ -81,16 +82,20 @@ function updatePatternUI(patternId, state) {
     const expandedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
     const collapsedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
 
-    statusElement.textContent = expandedText;
-    statusElement.style.color = '#4CAF50';
+    if (statusElement) {
+      statusElement.textContent = expandedText;
+      statusElement.style.color = '#4CAF50';
+    }
 
     if (collapsedStatusElement) {
       collapsedStatusElement.textContent = collapsedText;
       collapsedStatusElement.style.color = '#4CAF50';
     }
   } else {
-    statusElement.textContent = '[未激活]';
-    statusElement.style.color = 'black';
+    if (statusElement) {
+      statusElement.textContent = '[未激活]';
+      statusElement.style.color = 'black';
+    }
 
     if (collapsedStatusElement) {
       collapsedStatusElement.textContent = '[未激活]';

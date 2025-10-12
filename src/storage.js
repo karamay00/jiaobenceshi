@@ -103,3 +103,23 @@ function loadPanelPosition() {
     return null;
   }
 }
+
+// 保存玩家昵称到 localStorage
+function savePlayerName(name) {
+  try {
+    localStorage.setItem('batian_player_name', name);
+    console.log('[保存昵称]', name);
+  } catch (e) {
+    console.error('[保存昵称] 失败:', e);
+  }
+}
+
+// 从 localStorage 加载玩家昵称
+function loadPlayerName() {
+  try {
+    return localStorage.getItem('batian_player_name') || '霸天虎';
+  } catch (e) {
+    console.error('[加载昵称] 失败:', e);
+    return '霸天虎';
+  }
+}

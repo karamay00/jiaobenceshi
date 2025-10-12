@@ -1,0 +1,385 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+header {
+  background: white;
+  border-radius: 10px;
+  padding: 20px 30px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+header h1 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 28px;
+}
+
+.status {
+  display: flex;
+  gap: 30px;
+  font-size: 16px;
+  color: #666;
+}
+
+.status span {
+  font-weight: 500;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.game-area, .control-panel {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 22px;
+  border-bottom: 2px solid #667eea;
+  padding-bottom: 10px;
+}
+
+h3 {
+  color: #555;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.game-display {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px 15px 10px 15px;
+  margin-bottom: 20px;
+  min-height: 200px;
+}
+
+.game-info {
+  text-align: center;
+  color: #666;
+  line-height: 2;
+}
+
+.game-info p {
+  font-size: 16px;
+}
+
+.game-timer {
+  margin-top: 30px;
+  background: white;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.timer-bar {
+  height: 8px;
+  background: #667eea;
+  border-radius: 4px;
+  width: 0%;
+  transition: width 1s linear;
+}
+
+.timer-text {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.history {
+  margin-bottom: 20px;
+}
+
+#history-list {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 60px;
+  font-size: 20px;
+  line-height: 1.8;
+}
+
+.history-item {
+  font-weight: bold;
+  margin: 0 5px;
+}
+
+.panel-section {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 20px;
+}
+
+select, input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #5568d3;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.manual-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.manual-controls button:first-child {
+  background: #dc3545;
+}
+
+.manual-controls button:first-child:hover {
+  background: #c82333;
+}
+
+.manual-controls button:last-child {
+  background: #007bff;
+}
+
+.manual-controls button:last-child:hover {
+  background: #0069d9;
+}
+
+.game-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.btn-pause {
+  background: #ff9800 !important;
+}
+
+.btn-pause:hover {
+  background: #e68900 !important;
+}
+
+.btn-restart {
+  background: #4CAF50 !important;
+}
+
+.btn-restart:hover {
+  background: #45a049 !important;
+}
+
+.hint {
+  font-size: 12px;
+  color: #999;
+  margin-top: 5px;
+}
+
+#bet-records {
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.bet-record {
+  display: grid;
+  grid-template-columns: 50px 40px 60px 1fr;
+  gap: 10px;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  font-size: 13px;
+  align-items: center;
+}
+
+.bet-record:last-child {
+  border-bottom: none;
+}
+
+.bet-period {
+  color: #666;
+  font-weight: 500;
+}
+
+.bet-type {
+  font-weight: bold;
+}
+
+.bet-amount {
+  color: #333;
+  font-weight: 500;
+}
+
+.bet-time {
+  color: #999;
+  font-size: 12px;
+  text-align: right;
+}
+
+.no-data {
+  text-align: center;
+  color: #999;
+  padding: 20px;
+  font-size: 14px;
+}
+
+/* Console 显示区域 */
+.console-display, .raw-log-display {
+  margin-top: 20px;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.console-display:first-child {
+  margin-top: 0;
+}
+
+.console-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  background: #667eea;
+  color: white;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.btn-clear-console {
+  padding: 5px 15px;
+  font-size: 12px;
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+.btn-clear-console:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+#console-output, #raw-log-output {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 10px;
+  background: #1e1e1e;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.console-message, .raw-log-message {
+  padding: 4px 0;
+  color: #d4d4d4;
+  word-wrap: break-word;
+  border-bottom: 1px solid #2d2d2d;
+}
+
+.console-message:last-child, .raw-log-message:last-child {
+  border-bottom: none;
+}
+
+.console-time {
+  color: #858585;
+  font-size: 11px;
+}
+
+.console-content {
+  color: #d4d4d4;
+}
+
+.raw-log-content {
+  margin: 5px 0 0 0;
+  color: #d4d4d4;
+  font-size: 12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  padding-left: 10px;
+  border-left: 2px solid #667eea;
+}
+
+/* Console 滚动条美化 */
+#console-output::-webkit-scrollbar, #raw-log-output::-webkit-scrollbar {
+  width: 8px;
+}
+
+#console-output::-webkit-scrollbar-track, #raw-log-output::-webkit-scrollbar-track {
+  background: #2d2d2d;
+}
+
+#console-output::-webkit-scrollbar-thumb, #raw-log-output::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 4px;
+}
+
+#console-output::-webkit-scrollbar-thumb:hover, #raw-log-output::-webkit-scrollbar-thumb:hover {
+  background: #666;
+}
+
+/* 响应式 */
+@media (max-width: 1024px) {
+  .main {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 滚动条美化 */
+#bet-records::-webkit-scrollbar {
+  width: 6px;
+}
+
+#bet-records::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+#bet-records::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+#bet-records::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

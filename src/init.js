@@ -47,6 +47,40 @@ document.getElementById('clear-history').addEventListener('click', () => {
   clearAllData();
 });
 
+// 玩家昵称确认按钮事件
+document.getElementById('player-name-confirm').addEventListener('click', () => {
+  const input = document.getElementById('player-name-input');
+  const button = document.getElementById('player-name-confirm');
+  const newName = input.value.trim();
+
+  if (newName) {
+    window.playerName = newName;
+    savePlayerName(newName);
+    console.log('%c昵称已更新为: ' + newName, 'color: green; font-weight: bold');
+
+    // 视觉反馈：按钮变色并显示"已保存"
+    const originalText = button.textContent;
+    const originalBg = button.style.background;
+    button.textContent = '已保存';
+    button.style.background = '#2196F3';
+
+    // 1秒后恢复
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.style.background = originalBg;
+    }, 1000);
+  } else {
+    console.log('%c昵称不能为空', 'color: red');
+
+    // 视觉反馈：按钮闪红色
+    const originalBg = button.style.background;
+    button.style.background = '#f44336';
+    setTimeout(() => {
+      button.style.background = originalBg;
+    }, 500);
+  }
+});
+
 // 关闭面板按钮事件
 document.getElementById('close-panel').addEventListener('click', () => {
   document.getElementById('custom-panel').style.display = 'none';
@@ -55,15 +89,11 @@ document.getElementById('close-panel').addEventListener('click', () => {
 
 // 折叠/展开面板功能
 const toggleBtn = document.getElementById('toggle-panel');
-const panelTitle = document.getElementById('panel-title');
+const panelHeader = document.getElementById('panel-header');
 
 // 添加拖拽功能（mousedown 监听器）
-if (toggleBtn && window.dragStart) {
-  toggleBtn.addEventListener('mousedown', window.dragStart);
-}
-
-if (panelTitle && window.dragStart) {
-  panelTitle.addEventListener('mousedown', window.dragStart);
+if (panelHeader && window.dragStart) {
+  panelHeader.addEventListener('mousedown', window.dragStart);
 }
 
 // 阻止收起按钮的 click 事件在拖动后触发（使用 capture 阶段确保优先执行）
