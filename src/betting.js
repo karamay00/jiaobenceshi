@@ -397,8 +397,8 @@ function mergeConflictingBets(betsToPlace) {
 
 // 延迟批量下注
 function placeQueuedBets(finalBets) {
-  // 初始延迟随机化：最少10秒，最多 window.initialBetDelay
-  const minInitialDelay = 10000; // 最少10秒
+  // 初始延迟随机化：最少25秒，最多 window.initialBetDelay
+  const minInitialDelay = 25000; // 最少25秒
   const maxInitialDelay = Math.max(minInitialDelay, window.initialBetDelay || 0);
   const initialDelay = minInitialDelay + Math.random() * (maxInitialDelay - minInitialDelay);
 

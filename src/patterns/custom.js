@@ -1,5 +1,25 @@
 // ========== 自定义牌路管理 ==========
 
+// 更新自定义牌路的预览
+function updateCustomPatternPreview(patternId) {
+  const selectRow = document.getElementById(`select-row-custom-${patternId}`);
+  const collapsedPreview = document.querySelector(`#collapsed-custom-${patternId} span[style*="font-weight: bold"]`);
+
+  if (!selectRow || !collapsedPreview) return;
+
+  // 获取前6个牌型用于预览（带颜色）
+  const patternPreview = Array.from(selectRow.children)
+    .slice(0, 6)
+    .map(select => {
+      const val = select.value;
+      const color = val === '庄' ? 'red' : 'blue';
+      return `<span style="color: ${color};">${val}</span>`;
+    })
+    .join('');
+
+  collapsedPreview.innerHTML = patternPreview;
+}
+
 // 创建牌路元素
 function createPattern(initialData = null) {
   const patternId = initialData ? initialData.id : window.patternIdCounter;
@@ -225,7 +245,10 @@ function createPattern(initialData = null) {
     input.addEventListener('change', () => savePatterns());
   });
   selects.forEach(select => {
-    select.addEventListener('change', () => savePatterns());
+    select.addEventListener('change', () => {
+      updateCustomPatternPreview(patternId);  // 更新预览
+      savePatterns();
+    });
   });
 
   // 初始化牌路状态
@@ -238,6 +261,11 @@ function createPattern(initialData = null) {
     totalProfit: 0  // 累计盈亏
   };
   updatePatternUI(`custom-${patternId}`, window.patternStates[`custom-${patternId}`]);
+
+  // 如果是用户手动创建（不是恢复初始数据），自动保存
+  if (!initialData) {
+    savePatterns();
+  }
 }
 
 // 为自定义牌路添加一列
@@ -252,7 +280,10 @@ function addColumnToCustomPattern(patternId) {
 
   // 添加下拉菜单
   const newSelect = createBetSelect('庄', true);
-  newSelect.addEventListener('change', () => savePatterns());
+  newSelect.addEventListener('change', () => {
+    updateCustomPatternPreview(patternId);  // 更新预览
+    savePatterns();
+  });
   selectRow.appendChild(newSelect);
 
   // 启用删除按钮
@@ -260,6 +291,9 @@ function addColumnToCustomPattern(patternId) {
   if (deleteBtn) {
     deleteBtn.disabled = false;
   }
+
+  // 更新预览
+  updateCustomPatternPreview(patternId);
 }
 
 // 删除自定义牌路的最后一列
@@ -289,6 +323,9 @@ function deleteLastColumnFromCustomPattern(patternId) {
       deleteBtn.disabled = true;
     }
   }
+
+  // 更新预览
+  updateCustomPatternPreview(patternId);
 }
 
 // 锁定/解锁自定义牌路的交互
