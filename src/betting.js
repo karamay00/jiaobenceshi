@@ -397,16 +397,19 @@ function mergeConflictingBets(betsToPlace) {
 
 // 延迟批量下注
 function placeQueuedBets(finalBets) {
-  // 初始延迟（可配置）
-  const initialDelay = window.initialBetDelay || 0;
+  // 初始延迟随机化：0 到 window.initialBetDelay 之间随机
+  const initialDelay = Math.random() * (window.initialBetDelay || 0);
 
   setTimeout(() => {
     console.log(`[批量下注] 开始下注 ${finalBets.length} 个牌路`);
 
+    let cumulativeDelay = 0;  // 累积延迟
+
     finalBets.forEach((bet, index) => {
-      // 每个下注之间的延迟（可配置）
-      const intervalDelay = window.betInterval || 0;
-      const delay = index * intervalDelay;
+      // 每个间隔随机：0 到 window.betInterval 之间随机
+      if (index > 0) {
+        cumulativeDelay += Math.random() * (window.betInterval || 0);
+      }
 
       setTimeout(() => {
         // 临时生成 message
@@ -426,7 +429,7 @@ function placeQueuedBets(finalBets) {
 
         console.log(`[执行下注] ${patternDesc} 下注: ${message}`);
         placeBet(message, bet.patternId);
-      }, delay);
+      }, cumulativeDelay);
     });
   }, initialDelay);
 }
