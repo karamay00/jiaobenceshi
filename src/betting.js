@@ -10,6 +10,14 @@ function placeBet(message, patternId) {
     if (window.currentBets && window.currentBets.bets[patternId]) {
       window.currentBets.bets[patternId].betSuccess = true;
       console.log(`[下注状态更新] ${patternId} betSuccess=true (模拟模式)`);
+
+      // 更新UI显示（绿色成功）
+      if (window.patternStates[patternId]) {
+        updatePatternUI(patternId, window.patternStates[patternId]);
+      }
+
+      // 检查是否所有下注都完成
+      checkAndCalculate();
     }
     return;  // 不发送真实请求
   }
@@ -31,6 +39,14 @@ function placeBet(message, patternId) {
     if (window.currentBets && window.currentBets.bets[patternId]) {
       window.currentBets.bets[patternId].betSuccess = (d.code === 0);
       console.log(`[下注状态更新] ${patternId} betSuccess=${d.code === 0}, code=${d.code}`);
+
+      // 更新UI显示（绿色成功或红色失败）
+      if (window.patternStates[patternId]) {
+        updatePatternUI(patternId, window.patternStates[patternId]);
+      }
+
+      // 检查是否所有下注都完成
+      checkAndCalculate();
     }
   })
   .catch(error => {
@@ -39,8 +55,36 @@ function placeBet(message, patternId) {
     if (window.currentBets && window.currentBets.bets[patternId]) {
       window.currentBets.bets[patternId].betSuccess = false;
       console.log(`[下注状态更新] ${patternId} betSuccess=false (网络错误)`);
+
+      // 更新UI显示（红色失败）
+      if (window.patternStates[patternId]) {
+        updatePatternUI(patternId, window.patternStates[patternId]);
+      }
+
+      // 检查是否所有下注都完成
+      checkAndCalculate();
     }
   });
+}
+
+// 检查所有下注是否完成，如果完成且已开奖则计算盈亏
+function checkAndCalculate() {
+  if (!window.currentBets || !window.currentBets.bets) return;
+
+  // 增加完成计数
+  window.currentBets.completedBets++;
+  console.log(`[下注进度] ${window.currentBets.completedBets}/${window.currentBets.totalBets}`);
+
+  // 只在所有下注都完成时才检查
+  if (window.currentBets.completedBets >= window.currentBets.totalBets) {
+    console.log('[下注完成] 所有下注已完成');
+
+    // 如果已开奖，立即计算盈亏
+    if (window.currentBets.openResult) {
+      console.log('[下注完成] 已开奖，立即计算盈亏');
+      calculateProfits();
+    }
+  }
 }
 
 // 动态获取牌路的总列数
@@ -79,16 +123,39 @@ function updatePatternUI(patternId, state) {
   // 更新显示内容（展开容器和概览容器）
   if (state.isActivated) {
     const rowInfo = state.type === 'preset' ? ` 行${state.activeRowIndex + 1}` : '';
-    const expandedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
-    const collapsedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
+    let expandedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
+    let collapsedText = `[已激活${rowInfo} - 第${state.currentPointer}列]`;
+
+    // 检查是否有下注信息
+    if (window.currentBets && window.currentBets.bets && window.currentBets.bets[patternId]) {
+      const bet = window.currentBets.bets[patternId];
+      if (bet.betPlaced) {
+        // 构建下注信息：[庄30] 或 [閒50]
+        const betInfo = `[${bet.betType}${bet.betAmount}]`;
+
+        // 根据 betSuccess 决定颜色
+        let betColor;
+        if (bet.betSuccess === undefined) {
+          betColor = 'black';  // 等待中
+        } else if (bet.betSuccess === true) {
+          betColor = '#4CAF50';  // 成功（绿色）
+        } else {
+          betColor = '#f44336';  // 失败（红色）
+        }
+
+        // 追加到文本，用 span 包裹以设置颜色
+        expandedText += `<span style="color: ${betColor};">${betInfo}</span>`;
+        collapsedText += `<span style="color: ${betColor};">${betInfo}</span>`;
+      }
+    }
 
     if (statusElement) {
-      statusElement.textContent = expandedText;
+      statusElement.innerHTML = expandedText;
       statusElement.style.color = '#4CAF50';
     }
 
     if (collapsedStatusElement) {
-      collapsedStatusElement.textContent = collapsedText;
+      collapsedStatusElement.innerHTML = collapsedText;
       collapsedStatusElement.style.color = '#4CAF50';
     }
   } else {
@@ -287,7 +354,9 @@ function prepareBets() {
   window.currentBets = {
     period: null,
     openResult: null,
-    bets: {}
+    bets: {},
+    totalBets: 0,      // 新增：本期总下注数
+    completedBets: 0   // 新增：已完成的下注数
   };
 
   // 遍历所有牌路
@@ -334,7 +403,7 @@ function prepareBets() {
       betPlaced: true,
       betType: betType,
       betAmount: amount,
-      betSuccess: false
+      betSuccess: undefined  // 初始为 undefined 表示等待状态
     };
 
     // 加入下注队列
@@ -346,6 +415,18 @@ function prepareBets() {
   }
 
   console.log(`[准备下注] 找到 ${betsToPlace.length} 个牌路需要下注`);
+
+  // 设置本期总下注数
+  window.currentBets.totalBets = betsToPlace.length;
+
+  // 更新所有激活牌路的UI，显示初始下注信息（黑色等待状态）
+  for (let patternId in window.currentBets.bets) {
+    const bet = window.currentBets.bets[patternId];
+    if (bet.betPlaced && window.patternStates[patternId]) {
+      updatePatternUI(patternId, window.patternStates[patternId]);
+    }
+  }
+
   return betsToPlace;
 }
 
@@ -578,6 +659,13 @@ function calculateProfits() {
     window.winLoseHistory.push(totalPeriodProfit);
     console.log(`[手动模式] 本期总盈亏: ${totalPeriodProfit}`);
   }
+
+  // 保存为上一期记录（含输赢结果）
+  window.lastPeriodBets = JSON.parse(JSON.stringify(window.currentBets));
+
+  // 计算完成后清空当前记录，准备下一期
+  console.log('[计算完成] 清空 currentBets');
+  window.currentBets = null;
 }
 
 // 更新盈亏UI显示

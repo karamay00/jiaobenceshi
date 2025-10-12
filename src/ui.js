@@ -182,7 +182,7 @@ function updatePanel() {
   // 更新输赢历史
   const winLoseHistorySpan = document.getElementById('win-lose-history');
   if (window.winLoseHistory && window.winLoseHistory.length > 0) {
-    // 格式化输赢历史：正数加+显示绿色，负数显示红色，0显示黑色
+    // 格式化输赢历史：正数加+显示绿色，负数显示红色，0显示黑色并加+
     const formattedHistory = window.winLoseHistory.map(val => {
       let color = 'black';
       let text = val.toString();
@@ -191,6 +191,9 @@ function updatePanel() {
         text = `+${val}`;
       } else if (val < 0) {
         color = '#f44336';
+      } else {
+        // val === 0
+        text = '+0';
       }
       return `<span style="color: ${color};">${text}</span>`;
     }).join(' ');

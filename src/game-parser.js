@@ -122,21 +122,22 @@ function parseDataAndDisplay(logData) {
     // 立即更新面板
     updatePanel();
 
-    // 处理下注记录：补充期号和开奖结果，计算输赢
+    // 处理下注记录：补充期号和开奖结果，等待下注完成后计算输赢
     if (window.currentBets && window.bthStatus.period && window.bthStatus.result) {
       window.currentBets.period = `第${window.bthStatus.period}期`;
       window.currentBets.openResult = window.bthStatus.result;
 
       console.log('[开奖] 补充下注记录', window.currentBets);
 
-      // 立即计算本期输赢
-      calculateProfits();
+      // 如果所有下注已完成，立即计算盈亏
+      if (window.currentBets.completedBets >= window.currentBets.totalBets) {
+        console.log('[开奖] 所有下注已完成，立即计算盈亏');
+        calculateProfits();
+      } else {
+        console.log(`[开奖] 等待下注完成 (${window.currentBets.completedBets}/${window.currentBets.totalBets})`);
+      }
 
-      // 保存为上一期记录（可选，用于历史查询）
-      window.lastPeriodBets = JSON.parse(JSON.stringify(window.currentBets));
-
-      // 清空当前记录，准备下一期
-      window.currentBets = null;
+      // 注意：保存和清空都移到了 calculateProfits() 里
     }
 
     // 自动下注功能：更新历史、检查激活、推进指针
