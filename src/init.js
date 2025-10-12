@@ -149,9 +149,9 @@ document.querySelectorAll('input[name="betting-mode"]').forEach(radio => {
       window.betInterval = 3000;       // 3秒间隔
       console.log('%c[配置切换] 手动模式: 延迟15秒, 间隔3秒', 'color: cyan');
     } else {
-      window.initialBetDelay = 10000;  // 10秒延迟
+      window.initialBetDelay = 20000;  // 20秒延迟
       window.betInterval = 2500;       // 2.5秒间隔
-      console.log('%c[配置切换] 自动模式: 延迟10秒, 间隔2.5秒', 'color: cyan');
+      console.log('%c[配置切换] 自动模式: 延迟20秒, 间隔2.5秒', 'color: cyan');
     }
 
     console.log(`%c[模式切换] ${mode === 'auto' ? '自动模式' : '手动模式'}`, 'color: orange; font-weight: bold');
