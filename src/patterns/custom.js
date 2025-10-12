@@ -204,6 +204,14 @@ function createPattern(initialData = null) {
 
   // 展开状态勾选框事件
   document.getElementById(`enable-custom-${patternId}`).addEventListener('change', (e) => {
+    // 自动模式下，检查是否在封盘阶段
+    if (window.bettingMode === 'auto' && window.bthStatus.gamePhase !== '已封盘') {
+      // 恢复原状态（阻止切换）
+      e.target.checked = !e.target.checked;
+      alert('自动模式下只能在封盘阶段切换启用状态！');
+      return;
+    }
+
     const isEnabled = e.target.checked;
     console.log(`自定义牌路 ${patternId} ${isEnabled ? '已启用' : '已停用'}`);
     toggleCustomPatternInteraction(patternId, isEnabled);
@@ -219,6 +227,14 @@ function createPattern(initialData = null) {
 
   // 收起状态勾选框事件
   document.getElementById(`enable-collapsed-custom-${patternId}`).addEventListener('change', (e) => {
+    // 自动模式下，检查是否在封盘阶段
+    if (window.bettingMode === 'auto' && window.bthStatus.gamePhase !== '已封盘') {
+      // 恢复原状态（阻止切换）
+      e.target.checked = !e.target.checked;
+      alert('自动模式下只能在封盘阶段切换启用状态！');
+      return;
+    }
+
     const isEnabled = e.target.checked;
     console.log(`自定义牌路 ${patternId} ${isEnabled ? '已启用' : '已停用'}`);
     toggleCustomPatternInteraction(patternId, isEnabled);
